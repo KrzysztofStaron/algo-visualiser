@@ -7,31 +7,39 @@ export var arrayHistory: any[] = [];
 export var groupHistory: number[][] = [];
 export var indexHistory: number[] = [];
 
+var lastAction = "";
+
 export const useArrayHandler = (root:any) => {
   root.register("Array")
 
   const group = (data : number[], next = false) => {
     groupHistory.push(data);
 
-    if (next) {
+    if (next || lastAction === "group") {
       sync()
     }
+    lastAction = "group";
   }
 
-  const setIndex =(data : number, next = false) => {
+  const setIndex = (data : number, next = false) => {
     indexHistory.push(data);
 
-    if (next) {
+    if (next || lastAction === "index") {
       sync()
     }
+
+    lastAction = "index";
+
   }
 
   const setArray = (data : number[], next = false) => {
     arrayHistory.push([...data]);
     
-    if (next) {
+    if (next || lastAction === "array") {
       sync()
     }
+
+    lastAction = "array";
   };
 
   return [group, setIndex, setArray];

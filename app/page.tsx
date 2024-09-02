@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import ArrayComponent, { arrayHistory, arrayReset, indexHistory, groupHistory, useArrayHandler } from "./components/ArrayComponent";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 
