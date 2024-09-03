@@ -1,67 +1,92 @@
 "use client";
 
-import { useRef, useState } from "react";
-import ArrayComponent, { arrayHistory, arrayReset, indexHistory, groupHistory, useArrayHandler } from "./components/ArrayComponent";
+import { useEffect, useRef, useState } from "react";
+import ArrayComponent, { arrayHistory, arrayReset, indexHistory, groupHistory, createArrayHandler } from "./components/ArrayComponent";
 import CodeEditor from '@uiw/react-textarea-code-editor';
 
+
+var ids : string[] = []
 type state = {
   get: any;
   set: CallableFunction;
 };
 
-export const sync = () => {
+export const sync = (id : number) => {
   const maxLen = Math.max(arrayHistory.length, groupHistory.length, indexHistory.length);
 
   while (arrayHistory.length < maxLen) {
-    arrayHistory.push(arrayHistory.at(-1)!)
+    arrayHistory[id].push(arrayHistory[id].at(-1)!)
   }
 
   while (groupHistory.length < maxLen) {
-    groupHistory.push(groupHistory.at(-1)!)
+    groupHistory[id].push(groupHistory[id].at(-1)!)
   }
 
   while (indexHistory.length < maxLen) {
-    indexHistory.push(indexHistory.at(-1)!)
+    indexHistory[id].push(indexHistory[id].at(-1)!)
   }
 }
 
 export default function Home() {
   const [code, setCode] = useState(`
-const [group, setIndex, setArray] = useArray();
+const arr = createArray();
 
-setIndex(0)
-setArray([1,0,0])
+arr.frame({
+  index: 4,
+  content: [1, 2, 3, 4, 5],
+});
 
-setIndex(1)
-setArray([0,2,0])
+arr.group([4]);
 
-setIndex(2)
-setArray([0,0,3])
+arr.frame({
+  index: 3,
+  content: [1, 2, 3, 4],
+});
 
-group([0,1,2])
-setIndex(4)
-setArray([0,0,0])
+arr.group([3]);
+
+arr.frame({
+  index: 2,
+  content: [1, 2, 3],
+});
+
+arr.group([2]);
+
+  arr.frame({
+  index: 1,
+  content: [1, 2],
+});
+
+arr.group([1]);
+
+arr.frame({
+  index: 0,
+  content: [1],
+});
+
+arr.group([0]);
+arr.setArr([])
     `
   );
   const [speed, setSpeed] = useState(300);
-  const [ids, setIds] = useState<string[]>([])
 
-  const [index, setIndex] = useState(0);
-  const [group, setGroup] = useState<number[]>([]);
-  const [arr, setArr] = useState<any[]>([]);
+  const running = useRef(false);
 
+  // Maybe use Reference, ids was prev state, try things, bec it doesn't synchronise well
   const root = useRef({
     register(component : string) {
-      console.log("Regustered: ", component)
-      setIds(prev => [...prev, component])
-      return ids.length+1;
+      const ret = ids.length;
+      console.log("register", ret);
+      ids.push(component);
+      return ret;
     }
   })
 
-  const useArray = () => {
-    return useArrayHandler(root.current)
+  const createArray = () => {
+    return createArrayHandler(root.current)
   }
 
+  const [frame, setFrame] = useState(0);
   const i = useRef(0);
 
   return (
@@ -83,23 +108,37 @@ setArray([0,0,0])
         <button
           className="btn btn-success"
           onClick={() => {
-            setIds([]);
+            if (running.current) { 
+              return;
+            }
+            ids = [];
 
             arrayReset()
 
-            eval(code);
+            try {
+              eval(code);
+            } catch (err : any) {
+              console.error(err);
+            }
 
+
+            setFrame(0);
             i.current = 0;
+
             console.log("his: ", arrayHistory);
+            running.current = true;
+
+            const frames = Math.max(...arrayHistory.map(e => e.length));
+
             const interval = setInterval(() => {
               console.log("interval");
-              setIndex(indexHistory[i.current]);
-              setGroup(groupHistory[i.current]);
-              setArr(arrayHistory[i.current]);
 
-              i.current++;
-              if (i.current >= indexHistory.length) {
+              setFrame(p => p + 1);
+              i.current += 1;
+
+              if (i.current >= frames) {
                 console.log("clear");
+                running.current = false;
                 clearInterval(interval);
               }
             }, speed);
@@ -115,10 +154,10 @@ setArray([0,0,0])
         />
       </div>
 
-      <div className="flex items-center justify-center h-screen grow">
-        {ids.map((e, i) => {
+      <div className="flex items-center justify-center h-screen grow flex-col">
+        {ids.map((e, id) => {
           if (e === "Array") {
-            return <ArrayComponent key={i} index={index} group={group} data={arr}></ArrayComponent>
+            return <ArrayComponent key={id} index={indexHistory[id][frame]} group={groupHistory[id][frame]} data={arrayHistory[id][frame]}></ArrayComponent>
           } else {
             return null
           }

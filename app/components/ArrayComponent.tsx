@@ -1,48 +1,73 @@
 "use client";
 
-import React, { use, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import React from "react";
 import { sync } from "../page";
 
-export var arrayHistory: any[] = [];
-export var groupHistory: number[][] = [];
-export var indexHistory: number[] = [];
+export var arrayHistory: any[][] = [];
+export var groupHistory: number[][][] = [];
+export var indexHistory: number[][] = [];
 
-var lastAction = "";
+export const createArrayHandler = (root:any) => {
+  const id = root.register("Array");
 
-export const useArrayHandler = (root:any) => {
-  root.register("Array")
+  arrayHistory[id] = [];
+  groupHistory[id] = [];
+  indexHistory[id] = [];
 
-  const group = (data : number[], next = false) => {
-    groupHistory.push(data);
+  console.log("Array created", id);
 
-    if (next || lastAction === "group") {
-      sync()
+  const group = (data : number[], synhronize = true) => {
+    groupHistory[id].push([...data]);
+
+    if (synhronize) {
+      sync(id)
     }
-    lastAction = "group";
   }
 
-  const setIndex = (data : number, next = false) => {
-    indexHistory.push(data);
-
-    if (next || lastAction === "index") {
-      sync()
+  const setIndex = (data : number, synhronize = true) => {
+    indexHistory[id].push(data);
+  
+    if (synhronize) {
+      sync(id)
     }
-
-    lastAction = "index";
-
   }
 
-  const setArray = (data : number[], next = false) => {
-    arrayHistory.push([...data]);
-    
-    if (next || lastAction === "array") {
-      sync()
+  const setArr = (data : number[], synhronize = true) => {
+    arrayHistory[id].push([...data]);
+      
+    if (synhronize) {
+      sync(id)
     }
+  }
 
-    lastAction = "array";
-  };
+  return {
+    group: (data : number[], synhronize = true) => {
+      group(data, synhronize);
+    },
+  
+    setIndex: (data : number, synhronize = true) => {
+      setIndex(data, synhronize);
+    },
 
-  return [group, setIndex, setArray];
+    setArr: (data : number[], synhronize = true) => {
+      setArr(data, synhronize)
+    },
+
+    frame: (data : { index? : number, group?: number[], content?: any[]}) => {
+      if (data["index"] != undefined) {
+        setIndex(data["index"], false)
+      }
+      if (data["content"] != undefined) {
+        setArr(data["content"], false)
+      }
+      if (data["group"] != undefined) {
+        group(data["group"], false)
+      }
+
+      sync(id);
+    }
+  }
+
 }
 
 export var arrayReset = () => {
@@ -55,7 +80,7 @@ const ArrayComponent = React.forwardRef(({ index, data, group }: {  index: numbe
   return (
     <div>
       <div className="flex gap-1">
-        {data.map((item, i) => (
+        {(data ?? []).map((item, i) => (
           <Box
             key={i}
             data={item}

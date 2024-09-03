@@ -2,4 +2,6 @@
 methods:
 
 # Transcription
-When 2 Actions of the same type are called the `sync()` function is autmaticy called
+Sync every single time, but allow users to change execution speec
+
+Allow user to set multiple things in the same moment

@@ -1,20 +1,38 @@
 
-const [group, setIndex, setArray] = useArray();
+const arr = createArray();
 
-let arr = [0, 0, 0, 0, 1]
+arr.frame({
+  index: 4,
+  content: [1, 2, 3, 4, 5],
+});
 
+arr.group([4]);
 
-for (let j=0; j < 4; j ++) {
-  for (let i=arr.length-1; i >= 0; i--) {
-    arr[0] = 0;
-    arr[i] = 1;
-    if (i+1 != arr.length) {
-      arr[i+1] = 0;
-    }
+arr.frame({
+  index: 3,
+  content: [1, 2, 3, 4],
+});
 
-    setIndex(i)
-    setArray(arr, true);
-  
-  }
-  arr.pop()
-}
+arr.group([3]);
+
+arr.frame({
+  index: 2,
+  content: [1, 2, 3],
+});
+
+arr.group([2]);
+
+  arr.frame({
+  index: 1,
+  content: [1, 2],
+});
+
+arr.group([1]);
+
+arr.frame({
+  index: 0,
+  content: [1],
+});
+
+arr.group([0]);
+arr.setArr([])
