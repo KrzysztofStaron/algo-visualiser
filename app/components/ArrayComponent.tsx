@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { sync } from "../page";
 
@@ -53,7 +51,7 @@ export const createArrayHandler = (root:any) => {
       setArr(data, synhronize)
     },
 
-    frame: (data : { index? : number, group?: number[], content?: any[]}) => {
+    frame: (data : { index? : number, group?: number[], content?: any[]}, synhronize = true) => {
       if (data["index"] != undefined) {
         setIndex(data["index"], false)
       }
@@ -63,8 +61,9 @@ export const createArrayHandler = (root:any) => {
       if (data["group"] != undefined) {
         group(data["group"], false)
       }
-
-      sync(id);
+      if (synhronize) {
+        sync(id);
+      }
     }
   }
 

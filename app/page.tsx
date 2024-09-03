@@ -3,87 +3,121 @@
 import { useEffect, useRef, useState } from "react";
 import ArrayComponent, { arrayHistory, arrayReset, indexHistory, groupHistory, createArrayHandler } from "./components/ArrayComponent";
 import CodeEditor from '@uiw/react-textarea-code-editor';
+import LabelComponent, { createLabelHandler, labelHistory, resetLabel } from "./components/LabelComponent";
 
+var ids : {type: string, id: number}[] = []
 
-var ids : string[] = []
-type state = {
-  get: any;
-  set: CallableFunction;
-};
+// TODO: fix
+const calcLen = () => {
+  let max = 0;
+
+  for (let i = 0; i < ids.length; i++) {
+    max = Math.max(max, arrayHistory[i]?.length, groupHistory[i]?.length, indexHistory[i]?.length, labelHistory[i]?.length)
+  }
+
+  return max;
+}
+const reset = () => {
+  arrayReset();
+  resetLabel();
+}
 
 export const sync = (id : number) => {
-  const maxLen = Math.max(arrayHistory.length, groupHistory.length, indexHistory.length);
+  const maxLen = calcLen()
 
-  while (arrayHistory.length < maxLen) {
-    arrayHistory[id].push(arrayHistory[id].at(-1)!)
+  console.log("sync", maxLen)
+
+  for (let i of ids.filter(e => e.type === "Array").map(e => e.id)) {
+    while (arrayHistory[i].length < maxLen) {
+      arrayHistory[i].push(arrayHistory[i].at(-1)!)
+    }
+  
+    while (groupHistory[i].length < maxLen) {
+      groupHistory[i].push(groupHistory[i].at(-1)!)
+    }
+  
+    while (indexHistory[i].length < maxLen) {
+      indexHistory[i].push(indexHistory[i].at(-1)!)
+    }
   }
 
-  while (groupHistory.length < maxLen) {
-    groupHistory[id].push(groupHistory[id].at(-1)!)
-  }
-
-  while (indexHistory.length < maxLen) {
-    indexHistory[id].push(indexHistory[id].at(-1)!)
+  for (let i of ids.filter(e => e.type === "Label").map(e => e.id)) {
+    while (labelHistory[i].length < maxLen) {
+      labelHistory[i].push(labelHistory[i].at(-1)!)
+    }
   }
 }
 
 export default function Home() {
   const [code, setCode] = useState(`
-const arr = createArray();
+const top = createArray();
+const bottom = createArray();
+const test = createLabel();
 
-arr.frame({
-  index: 4,
-  content: [1, 2, 3, 4, 5],
+test.set("Hello")
+
+let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+top.frame({
+  content: arr, 
+  index: [arr.length-1],
+}, false);
+
+bottom.frame({
+  content: arr,
+  group: [arr.length-1]
 });
 
-arr.group([4]);
+while (arr.length != 1) {
+  bottom.group([arr.length-2], false);
+  let r = arr.pop();
+  test.set(r, false)
+  top.frame({
+    content: arr,
+    index: arr.length-1,
+  });
+}
 
-arr.frame({
-  index: 3,
-  content: [1, 2, 3, 4],
-});
+while (arr.length != 11) {
+  bottom.group([arr.length], false);
+  test.set(arr.length, false)
+  arr.push(arr.length);
+  top.frame({
+    content: arr,
+    index: arr.length-1,
+  });
+}
 
-arr.group([3]);
-
-arr.frame({
-  index: 2,
-  content: [1, 2, 3],
-});
-
-arr.group([2]);
-
-  arr.frame({
-  index: 1,
-  content: [1, 2],
-});
-
-arr.group([1]);
-
-arr.frame({
-  index: 0,
-  content: [1],
-});
-
-arr.group([0]);
-arr.setArr([])
     `
   );
   const [speed, setSpeed] = useState(300);
 
   const running = useRef(false);
 
-  // Maybe use Reference, ids was prev state, try things, bec it doesn't synchronise well
+  // Maybe use Reference
   const root = useRef({
     register(component : string) {
       const ret = ids.length;
       console.log("register", ret);
-      ids.push(component);
-      return ret;
+
+      const id = ids.filter(e => e.type === component).length;
+      console.log(component, ": ", id);
+
+      ids.push({type: component, id: id});
+      return id;
     }
   })
 
   const createArray = () => {
     return createArrayHandler(root.current)
+  }
+
+  const createLabel = () => {
+    return createLabelHandler(root.current)
+  }
+
+  const currentFrame = (len : number) => {
+    return Math.min(frame, len)
   }
 
   const [frame, setFrame] = useState(0);
@@ -113,7 +147,7 @@ arr.setArr([])
             }
             ids = [];
 
-            arrayReset()
+            reset()
 
             try {
               eval(code);
@@ -128,7 +162,8 @@ arr.setArr([])
             console.log("his: ", arrayHistory);
             running.current = true;
 
-            const frames = Math.max(...arrayHistory.map(e => e.length));
+            const frames = calcLen();
+            console.log("frames: ", frames);
 
             const interval = setInterval(() => {
               console.log("interval");
@@ -154,10 +189,12 @@ arr.setArr([])
         />
       </div>
 
-      <div className="flex items-center justify-center h-screen grow flex-col">
-        {ids.map((e, id) => {
-          if (e === "Array") {
-            return <ArrayComponent key={id} index={indexHistory[id][frame]} group={groupHistory[id][frame]} data={arrayHistory[id][frame]}></ArrayComponent>
+      <div className="flex items-center justify-center h-screen grow flex-col gap-20">
+        {ids.map((e, key) => {
+          if (e.type === "Array") {
+            return <ArrayComponent key={key} index={indexHistory[e.id][currentFrame(indexHistory[e.id].length - 1)]} group={groupHistory[e.id][Math.min(frame, groupHistory[e.id].length - 1)]} data={arrayHistory[e.id][Math.min(frame, arrayHistory[e.id].length - 1)]}></ArrayComponent>
+          } else if (e.type === "Label") {
+            return <LabelComponent key={key} content={labelHistory[e.id][currentFrame(labelHistory[e.id].length - 1)]}/>
           } else {
             return null
           }
