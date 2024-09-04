@@ -5,8 +5,8 @@ import { sync } from "../page";
 
 export var labelHistory : any[][] = [];
 
-export const createLabelHandler = (root:any) => {
-  const id = root.register("Label");
+export const createLabelHandler = (root:any, metadata:any) => {
+  const id = root.register("Label", metadata);
 
   labelHistory[id] = [];
 
@@ -29,7 +29,7 @@ export var resetLabel = () => {
   labelHistory = [];
 }
 
-const LabelComponent = ({content} : {content: any}) => {
+const LabelComponent = ({content, metadata} : {content: any, metadata: any}) => {
   return (
     <p className="text-3xl">{content}</p>
   )

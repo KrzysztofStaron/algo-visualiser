@@ -1,25 +1,39 @@
-let ar = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-const r = () => {
-  group([]);
-  setIndex(-1);
-  setArray(ar);
-};
+const left = createArray({orientation: "v"});
+const top = createArray();
+const text = createLabel();
 
-r();
+let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+text.set(arr.length-1, false)
 
-for (let i = 0; i < ar.length; i++) {
-  if (i == 0) {
-    ar[0] = 1;
-  } else if (i == 1) {
-    ar[1] = 2;
-  } else {
-    ar[i] = ar[i - 1] + ar[i - 2];
-  }
+left.frame({
+  content: arr, 
+  index: 10,
+}, false);
 
-  setArray(ar);
-  group([i - 1, i - 2]);
-  setIndex(i);
+top.frame({
+  content: arr,
+  group: arr
+});
+
+while (arr.length != 1) {
+  let r = arr.pop();
+  top.group(arr, false);
+  text.set(r, false)
+  left.frame({
+    content: arr,
+    index: arr.length-1,
+  });
 }
 
-r();
+while (arr.length != 11) {
+  text.set(arr.length, false)
+  arr.push(arr.length);
+  top.group(arr, false);
+  left.frame({
+    content: arr,
+    index: arr.length-1,
+  });
+}
+
+top.group(arr);
