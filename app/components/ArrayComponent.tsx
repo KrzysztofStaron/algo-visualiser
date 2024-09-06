@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ids, sync } from "../page";
+import { destructValue, ids, sync } from "../page";
 
 export var arrayHistory: any[][] = [];
 export var groupHistory: number[][][] = [];
@@ -15,7 +15,7 @@ export const createArrayHandler = (root:any, metadata:any) => {
   console.log("Array created: ", id);
 
   const group = (data : number[], synhronize = true) => {
-    groupHistory[id].push([...data]);
+    groupHistory[id].push([...destructValue(data)]);
 
     if (synhronize) {
       sync(id)
@@ -23,7 +23,7 @@ export const createArrayHandler = (root:any, metadata:any) => {
   }
 
   const setIndex = (data : number, synhronize = true) => {
-    indexHistory[id].push(data);
+    indexHistory[id].push(destructValue(data));
   
     if (synhronize) {
       sync(id)
@@ -31,7 +31,7 @@ export const createArrayHandler = (root:any, metadata:any) => {
   }
 
   const setArr = (data : number[], synhronize = true) => {
-    arrayHistory[id].push([...data]);
+    arrayHistory[id].push([...destructValue(data)]);
       
     if (synhronize) {
       sync(id)

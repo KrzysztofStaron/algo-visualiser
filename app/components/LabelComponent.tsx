@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { sync } from "../page";
+import { destructValue, sync } from "../page";
 
 export var labelHistory : any[][] = [];
 
@@ -15,7 +15,7 @@ export const createLabelHandler = (root:any, metadata:any) => {
 
   return {
     set: (data : any, synhronize = true) => {
-      labelHistory[id].push(data);
+      labelHistory[id].push(destructValue(data));
   
       if (synhronize) {
         sync(id)
@@ -31,7 +31,7 @@ export var resetLabel = () => {
 
 const LabelComponent = ({content, metadata} : {content: any, metadata: any}) => {
   return (
-    <p className="text-3xl">{content}</p>
+    <p className="text-3xl">{metadata?.pre ?? ""}{content}{metadata?.post ?? ""}</p>
   )
 }
 

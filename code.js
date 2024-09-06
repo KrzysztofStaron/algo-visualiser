@@ -1,5 +1,4 @@
-
-const left = createArray({orientation: "v"});
+const left = createArray({orientation: "v", anim: false});
 const top = createArray();
 const text = createLabel();
 
