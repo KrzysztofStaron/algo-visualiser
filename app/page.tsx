@@ -15,6 +15,7 @@ import Timeline from "./components/Timeline";
 import MatrixComponent, {
   createMatrixHandler,
   matrixColorHistory,
+  matrixGroupHistory,
   matrixHistory,
   matrixSync,
   resetMatrix,
@@ -49,7 +50,12 @@ const calcLen = () => {
   }
 
   for (let id of ids.filter(e => e.type === ComponentType.MATRIX).map(e => e.id)) {
-    max = Math.max(max, matrixHistory[id].length ?? 0, matrixColorHistory[id].length ?? 0);
+    max = Math.max(
+      max,
+      matrixHistory[id].length ?? 0,
+      matrixColorHistory[id].length ?? 0,
+      matrixGroupHistory[id].length ?? 0
+    );
   }
 
   console.log("Max Len: ", max);
@@ -79,6 +85,10 @@ const matrix = createMatrix();
 
 matrix.content([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
 matrix.colors({0: "green"})
+matrix.replace([0,0], 5)
+matrix.group([[0, 1]])
+matrix.replace([0,0], 6)
+matrix.replace([0,0], 7)
     `);
   const [speed, setSpeed] = useState(300);
 
@@ -143,6 +153,7 @@ matrix.colors({0: "green"})
     }
 
     console.log("Loop entered: ");
+    console.log(matrixHistory);
 
     setFrame(0);
     i.current = 0;

@@ -3,7 +3,7 @@
 import React from "react";
 import { ComponentType, destructValue, ids, sync } from "../page";
 
-export var labelHistory: any[][] = [];
+export var labelHistory: Array<Array<string>> = [];
 
 export const labelSync = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === ComponentType.LABEL).map(e => e.id)) {

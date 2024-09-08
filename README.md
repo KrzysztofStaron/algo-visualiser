@@ -11,3 +11,7 @@ methods:
 - render in if-else hell
 - Add the component the ComponentType enum
 - Register the component
+
+# Array<Array< type >>
+
+This creates history array of type

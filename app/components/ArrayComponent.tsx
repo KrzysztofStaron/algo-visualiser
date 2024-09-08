@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ComponentType, destructValue, ids, sync } from "../page";
 
-export var arrayHistory: any[][] = [];
-export var groupHistory: number[][][] = [];
-export var indexHistory: number[][] = [];
+export var arrayHistory: Array<Array<string[]>> = [];
+export var groupHistory: Array<Array<number[]>> = [];
+export var indexHistory: Array<Array<number>> = [];
 
 export const arraySync = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === ComponentType.ARRAY).map(e => e.id)) {
