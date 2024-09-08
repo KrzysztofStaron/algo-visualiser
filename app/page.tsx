@@ -20,7 +20,7 @@ import MatrixComponent, {
   resetMatrix,
 } from "./components/MatrixComponent";
 
-export var ids: { type: string; id: number; metadata: any }[] = [];
+export var ids: { type: ComponentType; id: number; metadata: any }[] = [];
 
 export const destructValue = (lambda: any) => {
   if (typeof lambda === "function") {
@@ -30,18 +30,25 @@ export const destructValue = (lambda: any) => {
   return lambda;
 };
 
+export enum ComponentType {
+  BASE,
+  ARRAY,
+  LABEL,
+  MATRIX,
+}
+
 const calcLen = () => {
   let max = 0;
 
-  for (let i of ids.filter(e => e.type === "Array").map(e => e.id)) {
+  for (let i of ids.filter(e => e.type === ComponentType.ARRAY).map(e => e.id)) {
     max = Math.max(max, arrayHistory[i].length, groupHistory[i].length, indexHistory[i].length);
   }
 
-  for (let i of ids.filter(e => e.type === "Label").map(e => e.id)) {
+  for (let i of ids.filter(e => e.type === ComponentType.LABEL).map(e => e.id)) {
     max = Math.max(max, labelHistory[i].length);
   }
 
-  for (let id of ids.filter(e => e.type === "Matrix").map(e => e.id)) {
+  for (let id of ids.filter(e => e.type === ComponentType.MATRIX).map(e => e.id)) {
     max = Math.max(max, matrixHistory[id].length ?? 0, matrixColorHistory[id].length ?? 0);
   }
 
@@ -57,12 +64,12 @@ const reset = () => {
 };
 
 export const sync = () => {
+  console.log("sync()");
+
   const maxLen = calcLen();
 
   arraySync(maxLen);
-
   labelSync(maxLen);
-
   matrixSync(maxLen);
 };
 
@@ -78,7 +85,7 @@ matrix.colors({0: "green"})
   const running = useRef(false);
 
   const root = useRef({
-    register(component: string, metadata?: any) {
+    register(component: ComponentType, metadata?: any) {
       const id = ids.filter(e => e.type === component).length;
       console.log({ component: component, index: ids.length, id: id });
 
@@ -140,7 +147,6 @@ matrix.colors({0: "green"})
     setFrame(0);
     i.current = 0;
 
-    console.log("his: ", matrixColorHistory);
     running.current = true;
 
     interval.current = setInterval(executeFrame, speed);
@@ -192,7 +198,7 @@ matrix.colors({0: "green"})
                   return null;
                 }
 
-                if (e.type === "Array") {
+                if (e.type === ComponentType.ARRAY) {
                   return <ArrayComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata} />;
                 } else {
                   return null;
@@ -205,13 +211,13 @@ matrix.colors({0: "green"})
                   return null;
                 }
 
-                if (e.type === "Array") {
+                if (e.type === ComponentType.ARRAY) {
                   return (
                     <ArrayComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata}></ArrayComponent>
                   );
-                } else if (e.type === "Label") {
+                } else if (e.type === ComponentType.LABEL) {
                   return <LabelComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata} />;
-                } else if (e.type === "Matrix") {
+                } else if (e.type === ComponentType.MATRIX) {
                   return <MatrixComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata} />;
                 } else {
                   return null;

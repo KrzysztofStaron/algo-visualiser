@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { destructValue, ids, sync } from "../page";
+import { ComponentType, destructValue, ids, sync } from "../page";
 
 export var arrayHistory: any[][] = [];
 export var groupHistory: number[][][] = [];
 export var indexHistory: number[][] = [];
 
 export const arraySync = (maxLen: number) => {
-  for (let i of ids.filter(e => e.type === "Array").map(e => e.id)) {
+  for (let i of ids.filter(e => e.type === ComponentType.ARRAY).map(e => e.id)) {
     while (arrayHistory[i].length < maxLen) {
       arrayHistory[i].push(arrayHistory[i].at(-1)!);
     }
@@ -22,7 +22,7 @@ export const arraySync = (maxLen: number) => {
 };
 
 export const createArrayHandler = (root: any, metadata: any) => {
-  const id = root.register("Array", metadata);
+  const id = root.register(ComponentType.ARRAY, metadata);
 
   arrayHistory[id] = [];
   groupHistory[id] = [];

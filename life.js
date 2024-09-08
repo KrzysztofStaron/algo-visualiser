@@ -1,6 +1,6 @@
 let matrixComponent = createMatrix();
 
-matrixComponent.colors({ 1: "green" });
+matrixComponent.colors({ 1: "green" }, false);
 
 function initializeMatrix(matrix, probability = 0.3) {
   for (let i = 0; i < matrix.length; i++) {
@@ -65,9 +65,9 @@ let matrix = new Array(10).fill(null).map(() => new Array(10).fill(0));
 initializeMatrix(matrix);
 
 for (let i = 0; i < 50; i++) {
-  matrixComponent.set(matrix);
+  matrixComponent.content(matrix);
 
   matrix = updateMatrix(matrix);
 }
 
-matrixComponent.set(new Array(10).fill(null).map(() => new Array(10).fill(0)));
+matrixComponent.content(new Array(10).fill(null).map(() => new Array(10).fill(0)));

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { destructValue, ids, sync } from "../page";
+import { ComponentType, destructValue, ids, sync } from "../page";
 
 export var matrixHistory: any[][][][] = [];
 export var matrixColorHistory: MatrixColor[][] = [];
@@ -20,7 +20,7 @@ const exampleColors: MatrixColor = {
 // frame
 
 export const matrixSync = (maxLen: number) => {
-  for (let i of ids.filter(e => e.type === "Matrix").map(e => e.id)) {
+  for (let i of ids.filter(e => e.type === ComponentType.MATRIX).map(e => e.id)) {
     while (matrixHistory[i].length < maxLen) {
       matrixHistory[i].push(matrixHistory[i].at(-1)!);
     }
@@ -32,7 +32,7 @@ export const matrixSync = (maxLen: number) => {
 };
 
 export const createMatrixHandler = (root: any, metadata: any) => {
-  const id = root.register("Matrix", metadata);
+  const id = root.register(ComponentType.MATRIX, metadata);
 
   matrixHistory[id] = [];
   matrixColorHistory[id] = [];
