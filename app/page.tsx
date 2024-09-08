@@ -59,23 +59,19 @@ const reset = () => {
 export const sync = () => {
   const maxLen = calcLen();
 
-  console.log("sync: ", maxLen);
-
   arraySync(maxLen);
 
   labelSync(maxLen);
 
   matrixSync(maxLen);
-
-  console.log("color His: ", matrixColorHistory);
 };
 
 export default function Home() {
   const [code, setCode] = useState(`
 const matrix = createMatrix();
 
+matrix.content([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
 matrix.colors({0: "green"})
-matrix.set([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
     `);
   const [speed, setSpeed] = useState(300);
 
@@ -83,11 +79,8 @@ matrix.set([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
 
   const root = useRef({
     register(component: string, metadata?: any) {
-      const ret = ids.length;
-      console.log("register", ret);
-
       const id = ids.filter(e => e.type === component).length;
-      console.log(component, ": ", id);
+      console.log({ component: component, index: ids.length, id: id });
 
       ids.push({ type: component, id: id, metadata: metadata ?? {} });
       return id;
@@ -116,16 +109,13 @@ matrix.set([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
   };
 
   const executeFrame = () => {
-    console.log("interval");
+    console.log("Frame: ", i.current);
 
     setFrame(p => p + 1);
     i.current += 1;
 
-    const frames = calcLen();
-    console.log("frames: ", frames);
-
-    if (i.current >= frames) {
-      console.log("clear");
+    if (i.current >= calcLen()) {
+      console.log("Loop exited");
       running.current = false;
       clearInterval(interval.current!);
     }

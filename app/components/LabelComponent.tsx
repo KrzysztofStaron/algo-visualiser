@@ -18,8 +18,6 @@ export const createLabelHandler = (root: any, metadata: any) => {
 
   labelHistory[id] = [];
 
-  console.log("Label Created: ", id);
-
   return {
     text: (data: any, synhronize = true) => {
       labelHistory[id].push(destructValue(data));

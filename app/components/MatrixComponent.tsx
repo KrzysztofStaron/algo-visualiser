@@ -37,18 +37,48 @@ export const createMatrixHandler = (root: any, metadata: any) => {
   matrixHistory[id] = [];
   matrixColorHistory[id] = [];
 
-  console.log("Matrix Created: ", id);
+  const setContent = (data: any, synhronize: boolean) => {
+    matrixHistory[id].push(destructValue(data));
+
+    if (synhronize) {
+      sync();
+    }
+  };
+
+  const setColors = (data: MatrixColor, synhronize: boolean) => {
+    matrixColorHistory[id].push({ ...data });
+
+    if (synhronize) {
+      sync();
+    }
+  };
 
   return {
-    content: (data: any, synhronize = true) => {
-      matrixHistory[id].push(destructValue(data));
+    replace: (position: [number, number], value: string, synhronize = true) => {
+      const content = matrixHistory[id].at(-1) ?? [];
 
-      if (synhronize) {
-        sync();
+      if (content[position[0]] == undefined) {
+        content[position[0]] = [];
       }
+
+      content[position[0]][position[1]] = value;
+
+      setContent(content, synhronize);
+    },
+    content: (data: string[][], synhronize = true) => {
+      setContent(data, synhronize);
     },
     colors: (data: MatrixColor, synhronize = true) => {
-      matrixColorHistory[id].push({ ...data });
+      setColors(data, synhronize);
+    },
+    frame: (data: { content?: any[][]; colors?: MatrixColor }, synhronize = true) => {
+      if (data["content"] != undefined) {
+        setContent(data["content"], false);
+      }
+
+      if (data["colors"] != undefined) {
+        setColors(data["colors"], false);
+      }
 
       if (synhronize) {
         sync();

@@ -28,8 +28,6 @@ export const createArrayHandler = (root: any, metadata: any) => {
   groupHistory[id] = [];
   indexHistory[id] = [];
 
-  console.log("Array created: ", id);
-
   const group = (data: number[], synhronize = true) => {
     groupHistory[id].push([...destructValue(data)]);
 
