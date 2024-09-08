@@ -3,9 +3,8 @@
 import React from "react";
 import { destructValue, ids, sync } from "../page";
 
-export var matrixHistory : any[][][][] = [];
-export var matrixColorHistory : MatrixColor[][] = [];
-
+export var matrixHistory: any[][][][] = [];
+export var matrixColorHistory: MatrixColor[][] = [];
 
 export type MatrixColor = { [key: string]: string };
 
@@ -20,52 +19,54 @@ const exampleColors: MatrixColor = {
 // setColors({0: red, 1:green})
 // frame
 
-export const matrixSync = (maxLen : number) => {
+export const matrixSync = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === "Matrix").map(e => e.id)) {
     while (matrixHistory[i].length < maxLen) {
-      matrixHistory[i].push(matrixHistory[i].at(-1)!)
+      matrixHistory[i].push(matrixHistory[i].at(-1)!);
     }
 
     while (matrixColorHistory[i].length < maxLen) {
-      matrixColorHistory[i].push(matrixColorHistory[i].at(-1)!)
+      matrixColorHistory[i].push(matrixColorHistory[i].at(-1) || {});
     }
   }
-}
+};
 
-export const createMatrixHandler = (root:any, metadata:any) => {
+export const createMatrixHandler = (root: any, metadata: any) => {
   const id = root.register("Matrix", metadata);
 
   matrixHistory[id] = [];
+  matrixColorHistory[id] = [];
 
-  console.log("Matrix Created: ", id)
-
+  console.log("Matrix Created: ", id);
 
   return {
-    set: (data : any, synhronize = true) => {
+    content: (data: any, synhronize = true) => {
       matrixHistory[id].push(destructValue(data));
-  
+
       if (synhronize) {
-        sync(id)
+        sync();
       }
     },
     colors: (data: MatrixColor, synhronize = true) => {
-      matrixColorHistory[id].push(data);
+      matrixColorHistory[id].push({ ...data });
 
       if (synhronize) {
-        sync(id)
+        sync();
       }
-    }
-  }
-
-}
+    },
+  };
+};
 
 export const resetMatrix = () => {
   matrixHistory = [];
-}
+  matrixColorHistory = [];
+};
 
-const MatrixComponent = ({content, metadata, colors} : {content: any[][], metadata: any, colors: MatrixColor}) => {
+const MatrixComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
+  const content = matrixHistory[id][Math.min(frame, matrixHistory[id].length - 1)] ?? [];
+  const rotatedContent = (content[0] ?? []).map((_, colIndex) => content.map(row => row[colIndex]));
 
-  const rotatedContent = content[0].map((_, colIndex) => content.map(row => row[colIndex]));
+  const colors = matrixColorHistory[id][Math.min(frame, matrixColorHistory[id].length - 1)] ?? {};
 
   return (
     <div className="flex gap-1">
@@ -84,15 +85,15 @@ const MatrixComponent = ({content, metadata, colors} : {content: any[][], metada
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 const Box = ({
   data,
   active,
   secoundaryActive,
   animate,
-  color
+  color,
 }: {
   data: any;
   active: boolean;
@@ -108,7 +109,9 @@ const Box = ({
   return (
     <div
       style={{ backgroundColor: color }}
-      className={`w-20 h-20 text-3xl flex items-center justify-center border-4 border-gray-950 ${bgColor} text-white ${animate ? "transition-all duration-100 ease" : ""}`}
+      className={`w-20 h-20 text-3xl flex items-center justify-center border-4 border-gray-950 ${bgColor} text-white ${
+        animate ? "transition-all duration-100 ease" : ""
+      }`}
     >
       <span>{data ?? ""}</span>
     </div>

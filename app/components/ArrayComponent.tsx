@@ -8,20 +8,20 @@ export var indexHistory: number[][] = [];
 export const arraySync = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === "Array").map(e => e.id)) {
     while (arrayHistory[i].length < maxLen) {
-      arrayHistory[i].push(arrayHistory[i].at(-1)!)
+      arrayHistory[i].push(arrayHistory[i].at(-1)!);
     }
-  
+
     while (groupHistory[i].length < maxLen) {
-      groupHistory[i].push(groupHistory[i].at(-1)!)
+      groupHistory[i].push(groupHistory[i].at(-1)!);
     }
-  
+
     while (indexHistory[i].length < maxLen) {
-      indexHistory[i].push(indexHistory[i].at(-1)!)
+      indexHistory[i].push(indexHistory[i].at(-1)!);
     }
   }
-}
+};
 
-export const createArrayHandler = (root:any, metadata:any) => {
+export const createArrayHandler = (root: any, metadata: any) => {
   const id = root.register("Array", metadata);
 
   arrayHistory[id] = [];
@@ -30,85 +30,89 @@ export const createArrayHandler = (root:any, metadata:any) => {
 
   console.log("Array created: ", id);
 
-  const group = (data : number[], synhronize = true) => {
+  const group = (data: number[], synhronize = true) => {
     groupHistory[id].push([...destructValue(data)]);
 
     if (synhronize) {
-      sync(id)
+      sync();
     }
-  }
+  };
 
-  const setIndex = (data : number, synhronize = true) => {
+  const setIndex = (data: number, synhronize = true) => {
     indexHistory[id].push(destructValue(data));
-  
-    if (synhronize) {
-      sync(id)
-    }
-  }
 
-  const setArr = (data : number[], synhronize = true) => {
-    arrayHistory[id].push([...destructValue(data)]);
-      
     if (synhronize) {
-      sync(id)
+      sync();
     }
-  }
+  };
+
+  const setArr = (data: number[], synhronize = true) => {
+    arrayHistory[id].push([...destructValue(data)]);
+
+    if (synhronize) {
+      sync();
+    }
+  };
 
   return {
-    group: (data : number[], synhronize = true) => {
+    group: (data: number[], synhronize = true) => {
       group(data, synhronize);
     },
-  
-    setIndex: (data : number, synhronize = true) => {
+
+    setIndex: (data: number, synhronize = true) => {
       setIndex(data, synhronize);
     },
 
-    setArr: (data : number[], synhronize = true) => {
-      setArr(data, synhronize)
+    setArr: (data: number[], synhronize = true) => {
+      setArr(data, synhronize);
     },
 
-    frame: (data : { index? : number, group?: number[], content?: any[]}, synhronize = true) => {
+    frame: (data: { index?: number; group?: number[]; content?: any[] }, synhronize = true) => {
       if (data["index"] != undefined) {
-        setIndex(data["index"], false)
+        setIndex(data["index"], false);
       }
       if (data["content"] != undefined) {
-        setArr(data["content"], false)
+        setArr(data["content"], false);
       }
       if (data["group"] != undefined) {
-        group(data["group"], false)
+        group(data["group"], false);
       }
       if (synhronize) {
-        sync(id);
+        sync();
       }
-    }
-  }
-
-}
+    },
+  };
+};
 
 export const arrayReset = () => {
   indexHistory = [];
   groupHistory = [];
   arrayHistory = [];
-}
+};
 
-const ArrayComponent = React.forwardRef(({ index, data, group, metadata }: {  index: number, data:any[], group: number[], metadata: any}, ref: any) => {
-  const flexType = (metadata.orientation ?? "") !== "v" ? "" : "flex-col";
+const ArrayComponent = React.forwardRef(
+  ({ frame, id, metadata }: { frame: number; id: number; metadata: any }, ref: any) => {
+    const flexType = (metadata.orientation ?? "") !== "v" ? "" : "flex-col";
 
-  return (
-    <div>
-      <div className={`flex gap-1 ${flexType}`}>
-        {(data ?? []).map((item, i) => (
-          <Box
-            key={i}
-            data={item}
-            active={index === i}
-            secoundaryActive={group?.includes(i)}
-            animate={metadata.anim ?? true}
-          />
-        ))}
+    const data = arrayHistory[id][Math.min(frame, arrayHistory[id].length - 1)];
+    const index = indexHistory[id][Math.min(frame, indexHistory[id].length - 1)];
+    const group = groupHistory[id][Math.min(frame, groupHistory[id].length - 1)];
+
+    return (
+      <div>
+        <div className={`flex gap-1 ${flexType}`}>
+          {(data ?? []).map((item: any, i: number) => (
+            <Box
+              key={i}
+              data={item}
+              active={index === i}
+              secoundaryActive={group?.includes(i)}
+              animate={metadata.anim ?? true}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
   }
 );
 
@@ -116,7 +120,7 @@ const Box = ({
   data,
   active,
   secoundaryActive,
-  animate
+  animate,
 }: {
   data: any;
   active: boolean;
@@ -130,7 +134,9 @@ const Box = ({
 
   return (
     <div
-      className={`w-20 h-20 text-3xl flex items-center justify-center border-4 border-gray-950 ${bgColor} text-white ${animate ? "transition-all duration-100 ease" : ""}`}
+      className={`w-20 h-20 text-3xl flex items-center justify-center border-4 border-gray-950 ${bgColor} text-white ${
+        animate ? "transition-all duration-100 ease" : ""
+      }`}
     >
       <span>{data ?? ""}</span>
     </div>
