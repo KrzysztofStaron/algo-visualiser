@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import ArrayComponent, { arrayHistory, arrayReset, indexHistory, groupHistory, createArrayHandler } from "./components/ArrayComponent";
+import ArrayComponent, { arrayHistory, arrayReset, indexHistory, groupHistory, createArrayHandler, arraySync } from "./components/ArrayComponent";
 import CodeEditor from '@uiw/react-textarea-code-editor';
-import LabelComponent, { createLabelHandler, labelHistory, resetLabel } from "./components/LabelComponent";
+import LabelComponent, { createLabelHandler, labelHistory, labelSync, resetLabel } from "./components/LabelComponent";
 import Timeline from "./components/Timeline";
-import MatrixComponent, { createMatrixHandler, matrixHistory } from "./components/MatrixComponent";
+import MatrixComponent, { createMatrixHandler, matrixColorHistory, matrixHistory, matrixSync, resetMatrix } from "./components/MatrixComponent";
 
 export var ids : {type: string, id: number, metadata: any}[] = [];
 
@@ -28,6 +28,10 @@ const calcLen = () => {
     max = Math.max(max, labelHistory[i].length)
   }
 
+  for (let i of ids.filter(e => e.type === "Matrix").map(e => e.id)) {
+    max = Math.max(max, matrixHistory[i].length, matrixColorHistory[i].length)
+  }
+
   console.log("Max: " , max)
 
   return max;
@@ -36,6 +40,7 @@ const calcLen = () => {
 const reset = () => {
   arrayReset();
   resetLabel();
+  resetMatrix();
 }
 
 export const sync = (id : number) => {
@@ -43,32 +48,20 @@ export const sync = (id : number) => {
 
   console.log("sync", maxLen)
 
-  for (let i of ids.filter(e => e.type === "Array").map(e => e.id)) {
-    while (arrayHistory[i].length < maxLen) {
-      arrayHistory[i].push(arrayHistory[i].at(-1)!)
-    }
-  
-    while (groupHistory[i].length < maxLen) {
-      groupHistory[i].push(groupHistory[i].at(-1)!)
-    }
-  
-    while (indexHistory[i].length < maxLen) {
-      indexHistory[i].push(indexHistory[i].at(-1)!)
-    }
-  }
+  arraySync(maxLen);
 
-  for (let i of ids.filter(e => e.type === "Label").map(e => e.id)) {
-    while (labelHistory[i].length < maxLen) {
-      labelHistory[i].push(labelHistory[i].at(-1)!)
-    }
-  }
+  labelSync(maxLen);
+
+  matrixSync(maxLen);
+
+  console.log(matrixColorHistory);
 }
 
 export default function Home() {
   const [code, setCode] = useState(`
 const matrix = createMatrix();
 
-matrix.set([[1, 2, 3], [3, 4, 5], [5, 6, 7]])
+matrix.set([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     `
   );
   const [speed, setSpeed] = useState(300);
@@ -216,7 +209,7 @@ matrix.set([[1, 2, 3], [3, 4, 5], [5, 6, 7]])
                 } else if (e.type === "Label") {
                   return <LabelComponent key={key} content={labelHistory[e.id][currentFrame(labelHistory[e.id].length - 1)]} metadata={ids[key].metadata}/>
                 } else if (e.type === "Matrix") {
-                  return <MatrixComponent key={key} content={matrixHistory[e.id][currentFrame(matrixHistory[e.id].length - 1)]} metadata={ids[key].metadata}/>
+                  return <MatrixComponent key={key} content={matrixHistory[e.id][currentFrame(matrixHistory[e.id].length - 1)]} metadata={ids[key].metadata} colors={matrixColorHistory[e.id][currentFrame(matrixColorHistory[e.id].length - 1)]}/>
                 } else {
                   return null
                 }

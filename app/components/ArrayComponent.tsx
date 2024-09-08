@@ -5,6 +5,22 @@ export var arrayHistory: any[][] = [];
 export var groupHistory: number[][][] = [];
 export var indexHistory: number[][] = [];
 
+export const arraySync = (maxLen: number) => {
+  for (let i of ids.filter(e => e.type === "Array").map(e => e.id)) {
+    while (arrayHistory[i].length < maxLen) {
+      arrayHistory[i].push(arrayHistory[i].at(-1)!)
+    }
+  
+    while (groupHistory[i].length < maxLen) {
+      groupHistory[i].push(groupHistory[i].at(-1)!)
+    }
+  
+    while (indexHistory[i].length < maxLen) {
+      indexHistory[i].push(indexHistory[i].at(-1)!)
+    }
+  }
+}
+
 export const createArrayHandler = (root:any, metadata:any) => {
   const id = root.register("Array", metadata);
 
@@ -69,7 +85,7 @@ export const createArrayHandler = (root:any, metadata:any) => {
 
 }
 
-export var arrayReset = () => {
+export const arrayReset = () => {
   indexHistory = [];
   groupHistory = [];
   arrayHistory = [];

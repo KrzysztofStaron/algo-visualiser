@@ -1,9 +1,17 @@
 "use client";
 
 import React from "react";
-import { destructValue, sync } from "../page";
+import { destructValue, ids, sync } from "../page";
 
 export var labelHistory : any[][] = [];
+
+export const labelSync = (maxLen: number) => {
+  for (let i of ids.filter(e => e.type === "Label").map(e => e.id)) {
+    while (labelHistory[i].length < maxLen) {
+      labelHistory[i].push(labelHistory[i].at(-1)!)
+    }
+  }
+}
 
 export const createLabelHandler = (root:any, metadata:any) => {
   const id = root.register("Label", metadata);
@@ -25,7 +33,7 @@ export const createLabelHandler = (root:any, metadata:any) => {
 
 }
 
-export var resetLabel = () => {
+export const resetLabel = () => {
   labelHistory = [];
 }
 
