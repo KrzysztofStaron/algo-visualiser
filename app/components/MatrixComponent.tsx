@@ -127,7 +127,7 @@ const MatrixComponent = ({ id, frame, metadata }: { id: number; frame: number; m
               color={colors[data] ?? ""}
               active={false}
               secoundaryActive={group.filter(e => e[0] === rowIndex && e[1] === colIndex).length > 0}
-              animate={false}
+              animate={metadata.anim ?? true}
             />
           ))}
         </div>
