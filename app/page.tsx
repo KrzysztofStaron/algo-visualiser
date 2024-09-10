@@ -136,6 +136,7 @@ matrix.replace([0,0], 7)
     if (i.current >= calcLen() || running.current === false) {
       console.log("Loop exited");
       running.current = false;
+      setButtonMsg("Start");
       clearInterval(interval.current!);
 
       return;
@@ -184,7 +185,7 @@ matrix.replace([0,0], 7)
   return (
     <div className="h-screen flex w-screen">
       <div className="flex flex-col" style={{ width: "50rem" }}>
-        <PrismCodeEditor />
+        <PrismCodeEditor setCode={setCode} />
         {/*<CodeEditor
           value={code}
           language="js"
