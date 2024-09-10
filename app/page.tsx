@@ -9,7 +9,6 @@ import ArrayComponent, {
   createArrayHandler,
   arraySync,
 } from "./components/ArrayComponent";
-import CodeEditor from "@uiw/react-textarea-code-editor";
 import LabelComponent, { createLabelHandler, labelHistory, labelSync, resetLabel } from "./components/LabelComponent";
 import Timeline from "./components/Timeline";
 import MatrixComponent, {
@@ -20,6 +19,7 @@ import MatrixComponent, {
   matrixSync,
   resetMatrix,
 } from "./components/MatrixComponent";
+import { PrismCodeEditor } from "./components/PrismCodeEditor";
 
 export var ids: { type: ComponentType; id: number; metadata: any }[] = [];
 
@@ -33,9 +33,9 @@ export const destructValue = (lambda: any) => {
 
 export enum ComponentType {
   BASE,
-  ARRAY,
-  LABEL,
-  MATRIX,
+  ARRAY = "Array",
+  LABEL = "Label",
+  MATRIX = "Matrix",
 }
 
 const calcLen = () => {
@@ -64,6 +64,8 @@ const calcLen = () => {
 };
 
 const reset = () => {
+  ids = [];
+
   arrayReset();
   resetLabel();
   resetMatrix();
@@ -80,7 +82,9 @@ export const sync = () => {
 };
 
 export default function Home() {
-  const [code, setCode] = useState(`
+  const [code, setCode] = useState("");
+
+  const initCode = useRef(`
 const matrix = createMatrix();
 
 matrix.content([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
@@ -90,9 +94,12 @@ matrix.group([[0, 1]])
 matrix.replace([0,0], 6)
 matrix.replace([0,0], 7)
     `);
+
   const [speed, setSpeed] = useState(300);
 
   const running = useRef(false);
+
+  const [buttonMsg, setButtonMsg] = useState("Start");
 
   const root = useRef({
     register(component: ComponentType, metadata?: any) {
@@ -126,23 +133,24 @@ matrix.replace([0,0], 7)
   };
 
   const executeFrame = () => {
+    if (i.current >= calcLen() || running.current === false) {
+      console.log("Loop exited");
+      running.current = false;
+      clearInterval(interval.current!);
+
+      return;
+    }
+
     console.log("Frame: ", i.current);
 
     setFrame(p => p + 1);
     i.current += 1;
-
-    if (i.current >= calcLen()) {
-      console.log("Loop exited");
-      running.current = false;
-      clearInterval(interval.current!);
-    }
   };
 
   const run = () => {
     if (running.current) {
       return;
     }
-    ids = [];
 
     reset();
 
@@ -153,7 +161,6 @@ matrix.replace([0,0], 7)
     }
 
     console.log("Loop entered: ");
-    console.log(matrixHistory);
 
     setFrame(0);
     i.current = 0;
@@ -177,27 +184,33 @@ matrix.replace([0,0], 7)
   return (
     <div className="h-screen flex w-screen">
       <div className="flex flex-col" style={{ width: "50rem" }}>
-        <CodeEditor
+        <PrismCodeEditor />
+        {/*<CodeEditor
           value={code}
           language="js"
           placeholder="let arr = [1, 2, 3, 4, 5];"
           onChange={evn => setCode(evn.target.value)}
-          className="h-full font-bold"
+          className="h-full font-bold overflow-scroll"
           padding={15}
           style={{
             backgroundColor: "rgb(3 7 18)",
             fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
             width: "50rem",
           }}
-        />
+        />*/}
         <button
           className="btn btn-success"
           onClick={() => {
-            run();
+            if (running.current) {
+              running.current = false;
+              setButtonMsg("Start");
+            } else {
+              run();
+              setButtonMsg("Stop");
+            }
           }}
         >
-          {" "}
-          Run
+          {buttonMsg}
         </button>
       </div>
       <div className="flex flex-col w-full h-screen">
@@ -238,7 +251,14 @@ matrix.replace([0,0], 7)
           </div>
         </div>
         <label>
-          <input type="range" min={1} max={400} value={speed} onChange={e => setSpeed(parseInt(e.target.value))} />
+          <input
+            type="range"
+            min={50}
+            max={400}
+            value={speed}
+            onChange={e => setSpeed(parseInt(e.target.value))}
+            step={50}
+          />
           <span className="px-2">{speed}</span>
         </label>
         <Timeline />
