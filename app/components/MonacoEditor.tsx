@@ -3,31 +3,29 @@ import * as monaco from "monaco-editor";
 
 import { concatenatedContent } from "./dts.json";
 
-function MonacoEditor() {
-  const code = `const matrix = createMatrix();`;
-
+function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFunction }) {
   // Define your custom API suggestions with sortText for ordering
   const apiSuggestions = [
     {
       label: "createMatrix",
-      kind: monaco.languages.CompletionItemKind.Function,
-      insertText: "createMatrix()",
+      kind: 1,
+      insertText: "const matix = createMatrix()",
       detail: "Returns a MatrixObject",
       documentation: "Creates a new Matrix object.",
       sortText: "001",
     },
     {
       label: "createLabel",
-      kind: monaco.languages.CompletionItemKind.Function,
-      insertText: "createLabel()",
+      kind: 1,
+      insertText: "const label = createLabel()",
       detail: "Returns a LabelObject",
       documentation: "Creates a new Label object.",
       sortText: "002",
     },
     {
       label: "createArray",
-      kind: monaco.languages.CompletionItemKind.Function,
-      insertText: "createArray()",
+      kind: 1,
+      insertText: "const arr = createArray()",
       detail: "Returns an ArrayObject",
       documentation: "Creates a new Array object.",
       sortText: "003",
@@ -71,11 +69,12 @@ function MonacoEditor() {
       theme="vs-dark"
       value={code}
       beforeMount={handleEditorWillMount} // Access monaco instance here
+      onChange={v => setCode(v)}
       options={{
         fontSize: 16,
         formatOnType: true,
         autoClosingBrackets: "always",
-        minimap: { scale: 1 },
+        minimap: { enabled: false },
         suggestOnTriggerCharacters: true,
       }}
     />

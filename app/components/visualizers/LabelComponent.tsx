@@ -19,10 +19,10 @@ export const createLabelHandler = (root: any, metadata: any) => {
   labelHistory[id] = [];
 
   return {
-    text: (data: any, synhronize = true) => {
+    text: (data: any, synchronize = true) => {
       labelHistory[id].push(destructValue(data));
 
-      if (synhronize) {
+      if (synchronize) {
         sync();
       }
     },
@@ -33,13 +33,13 @@ export const resetLabel = () => {
   labelHistory = [];
 };
 
-const LabelComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
+const LabelComponent: React.FC<{ id: number; frame: number; metadata: any }> = ({ id, frame, metadata }) => {
   const content = labelHistory[id][Math.min(frame, labelHistory[id].length - 1)];
   return (
     <p className="text-3xl">
-      {metadata?.pre ?? ""}
+      {metadata?.prefix ?? ""}
       {content}
-      {metadata?.post ?? ""}
+      {metadata?.suffix ?? ""}
     </p>
   );
 };

@@ -1,6 +1,6 @@
 /**
  * Represents the colors used in a matrix.
- * Maps numerical keys to color values.
+ * Maps keys to color values.
  */
 declare interface MatrixColor {
   [key: number]: string; // Maps numerical indices to color strings
@@ -33,10 +33,10 @@ declare interface MatrixObject {
 
   /**
    * Sets the colors for the matrix.
-   * @param data An object mapping indices to color values.
+   * @param colors An object mapping indices to color values.
    * @param synchronize Optional flag to indicate if synchronization is needed.
    */
-  colors(data: MatrixColor, synchronize?: boolean): void;
+  colors(colors: MatrixColor, synchronize?: boolean): void;
 
   /**
    * Sets the grouping for the matrix.
@@ -50,7 +50,7 @@ declare interface MatrixObject {
    * @param data An object containing content, colors, and group information.
    * @param synchronize Optional flag to indicate if synchronization is needed.
    */
-  frame(data: { content?: any[][]; colors?: MatrixColor; group?: Position[] }, synchronize?: boolean): void;
+  frame(data: { content?: string[][]; colors?: MatrixColor; group?: Position[] }, synchronize?: boolean): void;
 }
 
 /**

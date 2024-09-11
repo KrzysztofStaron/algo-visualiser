@@ -87,14 +87,7 @@ export const sync = () => {
 };
 
 export default function Home() {
-  const [code, setCode] = useState("");
-
-  const initCode = useRef(`const factory = function() {
-      return {msg: "hi", secret:"###"}
-}
-
-const msg = factory();
-    `);
+  const [code, setCode] = useState(``);
 
   const [speed, setSpeed] = useState(300);
 
@@ -186,25 +179,7 @@ const msg = factory();
   return (
     <div className="h-screen flex w-screen">
       <div className="flex flex-col" style={{ width: "50rem" }}>
-        <MonacoEditor />
-
-        {/*
-        
-<PrismCodeEditor setCode={setCode} value={initCode.current} />
-
-        <CodeEditor
-          value={code}
-          language="js"
-          placeholder="let arr = [1, 2, 3, 4, 5];"
-          onChange={evn => setCode(evn.target.value)}
-          className="h-full font-bold overflow-scroll"
-          padding={15}
-          style={{
-            backgroundColor: "rgb(3 7 18)",
-            fontFamily: "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
-            width: "50rem",
-          }}
-        />*/}
+        <MonacoEditor code={code} setCode={setCode} />
         <button
           className="btn btn-success"
           onClick={() => {
