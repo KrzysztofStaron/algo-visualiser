@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dts": "node tools/build-dts.js"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.0",
