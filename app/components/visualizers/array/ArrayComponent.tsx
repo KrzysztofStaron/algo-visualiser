@@ -44,7 +44,7 @@ export const createArrayHandler = (root: any, metadata: any) => {
     }
   };
 
-  const setArr = (data: number[], synhronize = true) => {
+  const setArr = (data: string[], synhronize = true) => {
     arrayHistory[id].push([...destructValue(data)]);
 
     if (synhronize) {
@@ -61,7 +61,7 @@ export const createArrayHandler = (root: any, metadata: any) => {
       setIndex(data, synhronize);
     },
 
-    setArr: (data: number[], synhronize = true) => {
+    setArr: (data: string[], synhronize = true) => {
       setArr(data, synhronize);
     },
 

@@ -7,7 +7,7 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
   // Define your custom API suggestions with sortText for ordering
   const apiSuggestions = [
     {
-      label: "createMatrix",
+      label: "matrix()",
       kind: 1,
       insertText: "const matix = createMatrix()",
       detail: "Returns a MatrixObject",
@@ -15,7 +15,7 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
       sortText: "001",
     },
     {
-      label: "createLabel",
+      label: "label()",
       kind: 1,
       insertText: "const label = createLabel()",
       detail: "Returns a LabelObject",
@@ -23,7 +23,7 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
       sortText: "002",
     },
     {
-      label: "createArray",
+      label: "arr()",
       kind: 1,
       insertText: "const arr = createArray()",
       detail: "Returns an ArrayObject",

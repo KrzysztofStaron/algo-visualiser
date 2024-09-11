@@ -8,13 +8,13 @@ import ArrayComponent, {
   groupHistory,
   createArrayHandler,
   arraySync,
-} from "./components/visualizers/ArrayComponent";
+} from "./components/visualizers/array/ArrayComponent";
 import LabelComponent, {
   createLabelHandler,
   labelHistory,
   labelSync,
   resetLabel,
-} from "./components/visualizers/LabelComponent";
+} from "./components/visualizers/label/LabelComponent";
 import Timeline from "./components/Timeline";
 import MatrixComponent, {
   createMatrixHandler,
@@ -23,7 +23,7 @@ import MatrixComponent, {
   matrixHistory,
   matrixSync,
   resetMatrix,
-} from "./components/visualizers/MatrixComponent";
+} from "./components/visualizers/matrix/MatrixComponent";
 import MonacoEditor from "./components/MonacoEditor";
 
 export var ids: { type: ComponentType; id: number; metadata: any }[] = [];
