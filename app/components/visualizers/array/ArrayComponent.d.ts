@@ -13,33 +13,7 @@ interface ArrayMetadata {
   anim?: boolean;
 }
 
-/**
- * Represents the data used in the frame method
- */
-interface ArrayFrameData {
-  /**
-   * The index to set in the array history
-   */
-  index?: number;
-
-  /**
-   * The group to set in the group history
-   */
-  group?: number[];
-
-  /**
-   * The content to set in the array history
-   */
-  content?: any[];
-}
-
-/**
- * Creates a handler for array operations.
- * @param root The root object for registering the handler
- * @param metadata Metadata for configuring the handler
- * @returns An object with methods to interact with array history
- */
-export function createArray(metadata: ArrayMetadata): {
+interface ArrayObject {
   /**
    * Sets the group data in the group history
    * @param data The group data to set
@@ -62,9 +36,22 @@ export function createArray(metadata: ArrayMetadata): {
   setArr(data: string[], synchronize?: boolean): void;
 
   /**
-   * Sets the frame data in the histories
-   * @param data The frame data to set
-   * @param synchronize Whether to synchronize the data
+   * Sets the frame data in the histories.
+   *
+   * The `data` parameter can include:
+   * - `index`: The index to set in the index history.
+   * - `group`: The group to set in the group history.
+   * - `content`: The content to set in the array history.
+   *
+   * Each field is optional. If a field is provided, it will update the respective history. If not, the existing data for that field will remain unchanged.
+   *
+   * @param data - The data to set in the histories. It can have the following properties:
+   *   - `index` (optional): A number representing the index to be set.
+   *   - `group` (optional): An array of numbers representing the group to be set.
+   *   - `content` (optional): An array of strings representing the content to be set.
+   * @param synchronize - Whether to synchronize the data. Defaults to `true`.
    */
-  frame(data: ArrayFrameData, synchronize?: boolean): void;
-};
+  frame(data: { index?: number; group?: number[]; content?: string[] }, synchronize?: boolean): void;
+}
+
+declare const createArray: (settings: ArraySettings) => ArrayObject;
