@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ComponentType, destructValue, ids, sync } from "../page";
+import { ComponentType, destructValue, ids, sync } from "@/app/page";
 
 export var arrayHistory: Array<Array<string[]>> = [];
 export var groupHistory: Array<Array<number[]>> = [];

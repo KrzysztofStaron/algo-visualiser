@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentType, ids } from "../page";
+import { ComponentType, ids } from "@/app/page";
 
 export var his: any[] = [];
 
