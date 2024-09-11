@@ -8,8 +8,13 @@ import ArrayComponent, {
   groupHistory,
   createArrayHandler,
   arraySync,
-} from "./components/ArrayComponent";
-import LabelComponent, { createLabelHandler, labelHistory, labelSync, resetLabel } from "./components/LabelComponent";
+} from "./components/visualizers/ArrayComponent";
+import LabelComponent, {
+  createLabelHandler,
+  labelHistory,
+  labelSync,
+  resetLabel,
+} from "./components/visualizers/LabelComponent";
 import Timeline from "./components/Timeline";
 import MatrixComponent, {
   createMatrixHandler,
@@ -18,8 +23,8 @@ import MatrixComponent, {
   matrixHistory,
   matrixSync,
   resetMatrix,
-} from "./components/MatrixComponent";
-import { PrismCodeEditor } from "./components/PrismCodeEditor";
+} from "./components/visualizers/MatrixComponent";
+import MonacoEditor from "./components/MonacoEditor";
 
 export var ids: { type: ComponentType; id: number; metadata: any }[] = [];
 
@@ -84,15 +89,11 @@ export const sync = () => {
 export default function Home() {
   const [code, setCode] = useState("");
 
-  const initCode = useRef(`
-const matrix = createMatrix();
+  const initCode = useRef(`const factory = function() {
+      return {msg: "hi", secret:"###"}
+}
 
-matrix.content([[0, 1, 1], [1, 1, 0], [0, 0, 1]])
-matrix.colors({0: "green"})
-matrix.replace([0,0], 5)
-matrix.group([[0, 1]])
-matrix.replace([0,0], 6)
-matrix.replace([0,0], 7)
+const msg = factory();
     `);
 
   const [speed, setSpeed] = useState(300);
@@ -185,8 +186,13 @@ matrix.replace([0,0], 7)
   return (
     <div className="h-screen flex w-screen">
       <div className="flex flex-col" style={{ width: "50rem" }}>
-        <PrismCodeEditor setCode={setCode} />
-        {/*<CodeEditor
+        <MonacoEditor />
+
+        {/*
+        
+<PrismCodeEditor setCode={setCode} value={initCode.current} />
+
+        <CodeEditor
           value={code}
           language="js"
           placeholder="let arr = [1, 2, 3, 4, 5];"

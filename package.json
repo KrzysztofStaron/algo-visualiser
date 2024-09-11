@@ -11,6 +11,7 @@
   "dependencies": {
     "@codemirror/autocomplete": "^6.18.0",
     "@codemirror/lang-javascript": "^6.2.2",
+    "@monaco-editor/react": "^4.6.0",
     "@uiw/react-textarea-code-editor": "^3.0.2",
     "daisyui": "^4.12.10",
     "next": "14.2.7",
