@@ -2,7 +2,7 @@ import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 
 import { concatenatedContent } from "./dts.json";
-import { apiSuggestions } from "./snippets.json";
+import { apiSuggestions } from "./snippets";
 
 function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFunction }) {
   const handleEditorWillMount = (monaco: Monaco) => {
