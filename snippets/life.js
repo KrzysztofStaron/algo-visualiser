@@ -66,8 +66,11 @@ initializeMatrix(matrix);
 
 for (let i = 0; i < 50; i++) {
   matrixComponent.content(matrix);
-
   matrix = updateMatrix(matrix);
+
+  if (matrix.some(row => row.some(cell => cell != 0)) === false) {
+    break;
+  }
 }
 
 matrixComponent.content(new Array(10).fill(null).map(() => new Array(10).fill(0)));

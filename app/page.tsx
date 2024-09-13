@@ -25,6 +25,7 @@ import MatrixComponent, {
   resetMatrix,
 } from "./components/visualizers/matrix/MatrixComponent";
 import MonacoEditor from "./components/MonacoEditor";
+import SpeedModulator from "./components/SpeedModulator";
 
 export var ids: { type: ComponentType; id: number; metadata: any }[] = [];
 
@@ -97,7 +98,7 @@ const register = (component: ComponentType, metadata?: any) => {
 export default function Home() {
   const [code, setCode] = useState(``);
 
-  const [speed, setSpeed] = useState(300);
+  const [speed, setSpeed] = useState(150);
 
   const running = useRef(false);
 
@@ -176,7 +177,7 @@ export default function Home() {
 
   return (
     <div className="h-screen flex w-screen">
-      <div className="flex flex-col" style={{ width: "50rem" }}>
+      <div className="flex flex-col mb-2 border-l-2 border-gray-600" style={{ width: "50rem" }}>
         <MonacoEditor code={code} setCode={setCode} />
         <button
           className="btn btn-success"
@@ -230,18 +231,16 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <label>
-          <input
-            type="range"
-            min={50}
-            max={400}
-            value={speed}
-            onChange={e => setSpeed(parseInt(e.target.value))}
-            step={50}
-          />
-          <span className="px-2">{speed}</span>
-        </label>
-        <Timeline />
+        <div className="w-full flex justify-between">
+          <div className="grow flex justify-center">
+            <SpeedModulator speed={speed} setSpeed={setSpeed} />
+          </div>
+          <progress
+            className="progress progress-accent w-40 h-4 m-2 self-end"
+            value={buttonMsg === "Stop" ? frame : 0}
+            max={calcLen()}
+          ></progress>
+        </div>
       </div>
     </div>
   );
