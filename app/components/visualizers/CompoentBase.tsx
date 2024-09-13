@@ -4,8 +4,8 @@ import { ComponentType, ids } from "@/app/page";
 
 export var his: any[] = [];
 
-export const createBase_handler = (root: any, metadata: any) => {
-  const id = root.register("", metadata);
+export const createBase_handler = (register: CallableFunction, metadata: any) => {
+  const id = register("", metadata);
 
   his[id] = [];
 

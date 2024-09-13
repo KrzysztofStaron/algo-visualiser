@@ -54,4 +54,10 @@ interface ArrayObject {
   frame(data: { index?: number; group?: number[]; content?: string[] }, synchronize?: boolean): void;
 }
 
+type orientation = "v" | "";
+
+type ArraySettings = {
+  orientation?: orientation;
+};
+
 declare const createArray: (settings: ArraySettings) => ArrayObject;

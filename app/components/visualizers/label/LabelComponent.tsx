@@ -13,8 +13,8 @@ export const labelSync = (maxLen: number) => {
   }
 };
 
-export const createLabelHandler = (root: any, metadata: any) => {
-  const id = root.register(ComponentType.LABEL, metadata);
+export const createLabelHandler = (register: CallableFunction, metadata: any) => {
+  const id = register(ComponentType.LABEL, metadata);
 
   labelHistory[id] = [];
 

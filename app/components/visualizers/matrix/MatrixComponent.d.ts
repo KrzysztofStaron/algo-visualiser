@@ -5,7 +5,6 @@
 declare interface MatrixColor {
   [key: number]: string; // Maps numerical indices to color strings
 }
-
 /**
  * Represents a position in a 2D space.
  * Tuple with X and Y coordinates.

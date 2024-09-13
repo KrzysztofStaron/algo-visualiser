@@ -37,8 +37,8 @@ export const matrixSync = (maxLen: number) => {
   }
 };
 
-export const createMatrixHandler = (root: any, metadata: any) => {
-  const id = root.register(ComponentType.MATRIX, metadata);
+export const createMatrixHandler = (register: CallableFunction, metadata: any) => {
+  const id = register(ComponentType.MATRIX, metadata);
 
   matrixHistory[id] = [];
   matrixColorHistory[id] = [];

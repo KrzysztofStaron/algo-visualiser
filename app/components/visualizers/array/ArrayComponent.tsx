@@ -21,8 +21,8 @@ export const arraySync = (maxLen: number) => {
   }
 };
 
-export const createArrayHandler = (root: any, metadata: any) => {
-  const id = root.register(ComponentType.ARRAY, metadata);
+export const createArrayHandler = (register: CallableFunction, metadata: any) => {
+  const id = register(ComponentType.ARRAY, metadata);
 
   arrayHistory[id] = [];
   groupHistory[id] = [];

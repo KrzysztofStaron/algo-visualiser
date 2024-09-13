@@ -86,6 +86,14 @@ export const sync = () => {
   matrixSync(maxLen);
 };
 
+const register = (component: ComponentType, metadata?: any) => {
+  const id = ids.filter(e => e.type === component).length;
+  console.log({ component: component, index: ids.length, id: id });
+
+  ids.push({ type: component, id: id, metadata: metadata ?? {} });
+  return id;
+};
+
 export default function Home() {
   const [code, setCode] = useState(``);
 
@@ -95,37 +103,25 @@ export default function Home() {
 
   const [buttonMsg, setButtonMsg] = useState("Start");
 
-  const root = useRef({
-    register(component: ComponentType, metadata?: any) {
-      const id = ids.filter(e => e.type === component).length;
-      console.log({ component: component, index: ids.length, id: id });
-
-      ids.push({ type: component, id: id, metadata: metadata ?? {} });
-      return id;
-    },
-  });
-
   const [frame, setFrame] = useState(0);
   const i = useRef(0);
 
   const interval = useRef<NodeJS.Timeout>();
 
+  // Quality od life, so user don't have to provide root as an argument
   const createArray = (metadata?: any) => {
-    return createArrayHandler(root.current, metadata ?? "");
+    return createArrayHandler(register, metadata ?? "");
   };
 
   const createLabel = (metadata: any) => {
-    return createLabelHandler(root.current, metadata ?? "");
+    return createLabelHandler(register, metadata ?? "");
   };
 
   const createMatrix = (metadata: any) => {
-    return createMatrixHandler(root.current, metadata ?? "");
+    return createMatrixHandler(register, metadata ?? "");
   };
 
-  const currentFrame = (len: number) => {
-    return Math.min(frame, len);
-  };
-
+  // function that runs every frame
   const executeFrame = () => {
     if (i.current >= calcLen() || running.current === false) {
       console.log("Loop exited");
@@ -142,6 +138,7 @@ export default function Home() {
     i.current += 1;
   };
 
+  // Code execution setup
   const run = () => {
     if (running.current) {
       return;
@@ -165,6 +162,7 @@ export default function Home() {
     interval.current = setInterval(executeFrame, speed);
   };
 
+  // Speed change handling
   useEffect(() => {
     if (running.current === false) {
       return;

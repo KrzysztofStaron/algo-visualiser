@@ -29,6 +29,7 @@ function getDtsFiles(dir) {
 function concatenateDtsFiles(filePaths) {
   return filePaths.reduce((acc, filePath) => {
     const content = fs.readFileSync(filePath, "utf8");
+    console.log(filePath, "-", content.length);
     return acc + "\n" + content; // Concatenate with newline separator
   }, "");
 }
@@ -47,7 +48,7 @@ function processDtsFiles() {
 
   const outputFilePath = path.join("app/components", "dts.json");
   fs.writeFileSync(outputFilePath, JSON.stringify(result, null, 2));
-  console.log(`Combined .d.ts files saved to ${outputFilePath}`);
+  console.log(`\nSaved to ${outputFilePath}`);
 }
 
 // Run the program
