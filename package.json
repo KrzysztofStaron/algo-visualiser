@@ -10,16 +10,14 @@
     "dts": "node tools/build-dts.js"
   },
   "dependencies": {
-    "@codemirror/autocomplete": "^6.18.0",
-    "@codemirror/lang-javascript": "^6.2.2",
     "@monaco-editor/react": "^4.6.0",
     "@uiw/react-textarea-code-editor": "^3.0.2",
     "daisyui": "^4.12.10",
     "next": "14.2.7",
-    "prism-react-editor": "^1.1.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-simple-code-editor": "^0.14.1"
+    "react-simple-code-editor": "^0.14.1",
+    "thefuck": "^0.0.2"
   },
   "devDependencies": {
     "@types/node": "^20",

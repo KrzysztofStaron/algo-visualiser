@@ -2,36 +2,9 @@ import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 
 import { concatenatedContent } from "./dts.json";
+import { apiSuggestions } from "./snippets.json";
 
 function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFunction }) {
-  // Define your custom API suggestions with sortText for ordering
-  const apiSuggestions = [
-    {
-      label: "const createMatrix()",
-      kind: 4,
-      insertText: "const matix = createMatrix()",
-      detail: "Returns a MatrixObject",
-      documentation: "Creates a new Matrix object.",
-      sortText: "001",
-    },
-    {
-      label: "const createLabel()",
-      kind: 4,
-      insertText: "const label = createLabel()",
-      detail: "Returns a LabelObject",
-      documentation: "Creates a new Label object.",
-      sortText: "002",
-    },
-    {
-      label: "const createArray()",
-      kind: 4,
-      insertText: "const arr = createArray()",
-      detail: "Returns an ArrayObject",
-      documentation: "Creates a new Array object.",
-      sortText: "003",
-    },
-  ];
-
   const handleEditorWillMount = (monaco: Monaco) => {
     // Provide TypeScript type definitions
     monaco.languages.typescript.javascriptDefaults.addExtraLib(concatenatedContent, "ts:filename/factories.d.ts");
