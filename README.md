@@ -15,7 +15,9 @@ This creates history array of type
 # Main
 
 `register (component: ComponentType, metadata?: any) ` - abstracts setup of component and returns it's id in _histories arrays_
+
 `sync` - makes sure every single timeline is the same length, by duplicating old values
+
 `calcLen` - return length of the longest timeline
 
 # synchronize?: boolean

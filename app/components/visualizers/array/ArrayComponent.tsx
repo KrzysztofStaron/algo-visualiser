@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { ComponentType, destructValue, ids, sync } from "@/app/page";
 
 export var arrayHistory: Array<Array<string[]>> = [];

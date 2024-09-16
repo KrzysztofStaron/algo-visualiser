@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ArrayComponent, {
   arrayHistory,
   arrayReset,
@@ -64,8 +64,6 @@ const calcLen = () => {
     );
   }
 
-  console.log("Max Len: ", max);
-
   return max;
 };
 
@@ -78,9 +76,8 @@ const reset = () => {
 };
 
 export const sync = () => {
-  console.log("sync()");
-
   const maxLen = calcLen();
+  console.log(`sync(), maxLen: ${maxLen}`);
 
   arraySync(maxLen);
   labelSync(maxLen);
@@ -108,6 +105,7 @@ export default function Home() {
   const i = useRef(0);
 
   const interval = useRef<NodeJS.Timeout>();
+  const maxLen = useRef(0);
 
   // Quality od life, so user don't have to provide root as an argument
   const createArray = (metadata?: any) => {
@@ -124,19 +122,21 @@ export default function Home() {
 
   // function that runs every frame
   const executeFrame = () => {
-    if (i.current >= calcLen() || running.current === false) {
-      console.log("Loop exited");
+    if (i.current >= maxLen.current || running.current === false) {
+      // last frame reached
       running.current = false;
       setButtonMsg("Start");
+
       clearInterval(interval.current!);
 
-      return;
+      console.log("< loop exit >");
+    } else {
+      // next frame
+      console.log("Frame: ", i.current);
+
+      setFrame(p => p + 1);
+      i.current += 1;
     }
-
-    console.log("Frame: ", i.current);
-
-    setFrame(p => p + 1);
-    i.current += 1;
   };
 
   // Code execution setup
@@ -148,12 +148,16 @@ export default function Home() {
     reset();
 
     try {
+      console.log("< timeline eval >");
       eval(code);
     } catch (err: any) {
       console.error(err);
     }
 
-    console.log("Loop entered: ");
+    maxLen.current = calcLen();
+    console.log("set maxLen: ", maxLen.current);
+
+    console.log("< loop entered >");
 
     setFrame(0);
     i.current = 0;
@@ -177,23 +181,27 @@ export default function Home() {
 
   return (
     <div className="h-screen flex w-screen">
-      <div className="flex flex-col mb-2 border-l-2 border-gray-600" style={{ width: "50rem" }}>
-        <MonacoEditor code={code} setCode={setCode} />
-        <button
-          className="btn btn-success"
-          onClick={() => {
-            if (running.current) {
-              running.current = false;
-              setButtonMsg("Start");
-            } else {
-              run();
-              setButtonMsg("Stop");
-            }
-          }}
-        >
-          {buttonMsg}
-        </button>
+      <div className="flex" style={{ width: "300px" }}>
+        <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-full">
+          <MonacoEditor code={code} setCode={setCode} />
+          <button
+            className="btn btn-success"
+            onClick={() => {
+              if (running.current) {
+                running.current = false;
+                setButtonMsg("Start");
+              } else {
+                run();
+                setButtonMsg("Stop");
+              }
+            }}
+          >
+            {buttonMsg}
+          </button>
+        </div>
+        <div className="w-1 h-full bg-red-300 cursor-e-resize" onMouseDown={() => {}} onMouseUp={() => {}}></div>
       </div>
+
       <div className="flex flex-col w-full h-screen">
         <div className="flex items-center justify-center h-screen grow flex-col">
           <div className="flex gap-10">
@@ -238,7 +246,7 @@ export default function Home() {
           <progress
             className="progress progress-accent w-40 h-4 m-2 self-end"
             value={buttonMsg === "Stop" ? frame : 0}
-            max={calcLen()}
+            max={maxLen.current}
           ></progress>
         </div>
       </div>
