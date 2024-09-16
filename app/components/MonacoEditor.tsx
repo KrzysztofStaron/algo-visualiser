@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
-import { concatenatedContent } from "./dts.json";
+
+import data from "./dts.json";
 
 const apiSuggestions = [
   {
@@ -37,7 +38,7 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
   const resizing = useRef(false);
 
   const handleEditorWillMount = (monaco: Monaco) => {
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(concatenatedContent, "ts:filename/factories.d.ts");
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(data.concatenatedContent, "ts:filename/factories.d.ts");
 
     monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
       target: monaco.languages.typescript.ScriptTarget.ES2020,

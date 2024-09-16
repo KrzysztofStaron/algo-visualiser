@@ -10,16 +10,7 @@ export var matrixGroupHistory: Array<Array<position[]>>;
 type position = [number, number];
 export type MatrixColor = { [key: string]: string };
 
-/* Example data
-const exampleColors: MatrixColor = {
-  0: "red",
-  1: "green",
-  2: "blue",
-};*/
-
-// set
-// setColors({0: red, 1:green})
-// frame
+import { tailwindToHex } from "@/app/tailwindToHex";
 
 export const matrixSync = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === ComponentType.MATRIX).map(e => e.id)) {
@@ -149,6 +140,10 @@ const Box = ({
   animate: boolean;
   color: string;
 }) => {
+  if (color.startsWith("bg-")) {
+    color = tailwindToHex(color);
+  }
+
   let bgColor = active ? "bg-sky-900" : "bg-stone-900";
   if (secoundaryActive) {
     bgColor = "bg-orange-800";

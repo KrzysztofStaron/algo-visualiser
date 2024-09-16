@@ -24,10 +24,13 @@ import MatrixComponent, {
   matrixSync,
   resetMatrix,
 } from "./components/visualizers/matrix/MatrixComponent";
-import MonacoEditor from "./components/MonacoEditor";
+const MonacoEditor = dynamic(() => import("./components/MonacoEditor"), { ssr: false });
 import SpeedModulator from "./components/SpeedModulator";
+import dynamic from "next/dynamic";
 
-export var ids: { type: ComponentType; id: number; metadata: any }[] = [];
+type ComponentData = { type: ComponentType; id: number; metadata: any };
+
+export var ids: ComponentData[] = [];
 
 export const destructValue = (lambda: any) => {
   if (typeof lambda === "function") {
@@ -93,7 +96,11 @@ const register = (component: ComponentType, metadata?: any) => {
 };
 
 export default function Home() {
-  const [code, setCode] = useState(``);
+  const [code, setCode] = useState(`const matrix = createMatrix()
+
+matrix.colors({ 0: "bg-red-400", 1: "green", 2: "#ff00ff" })
+matrix.content([[0, 1, 2]])
+`);
 
   const [speed, setSpeed] = useState(150);
 
@@ -149,7 +156,9 @@ export default function Home() {
 
     try {
       console.log("< timeline eval >");
-      eval(code);
+      if (typeof window !== "undefined") {
+        eval(code);
+      }
     } catch (err: any) {
       console.error(err);
     }
@@ -200,9 +209,9 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col w-full h-screen">
-        <div className="flex items-center justify-center h-screen grow flex-col">
+        <div className="flex items-center justify-center h-screen grow flex-col overflow-hidden">
           <div className="flex gap-10">
-            <div>
+            <div className="flex">
               {ids.map((e, key) => {
                 if (ids[key].metadata.orientation !== "v") {
                   return null;

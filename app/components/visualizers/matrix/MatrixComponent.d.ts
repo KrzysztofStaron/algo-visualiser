@@ -1,7 +1,6 @@
 /**
  * Represents the colors used in a matrix.
  * Maps keys to color values.
- * key: color -> 0: red
  */
 declare interface MatrixColor {
   [key: string]: string; // Maps numerical indices to color strings
@@ -33,7 +32,10 @@ declare interface MatrixObject {
 
   /**
    * Sets the colors for the matrix.
+   *
    * @param colors An object mapping indices to color values.
+   *
+   * ```{0: "white" | "#fff" | "bg-white"}```
    * @param synchronize Optional flag to indicate if synchronization is needed.
    */
   colors(colors: MatrixColor, synchronize?: boolean): void;

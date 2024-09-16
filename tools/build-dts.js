@@ -39,7 +39,7 @@ function concatenateDtsFiles(filePaths) {
     const content = fs.readFileSync(filePath, "utf8");
     const name = filePath.split("\\").at(-1);
 
-    console.log(`${(content.length / sum).toFixed(2)}% => ${name}`);
+    console.log(`${(content.length / sum).toFixed(2)}% -> ${name}`);
     return acc + "\n" + content; // Concatenate with newline separator
   }, "");
 }
