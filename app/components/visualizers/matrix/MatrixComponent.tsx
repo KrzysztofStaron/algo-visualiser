@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ComponentType, destructValue, ids, sync } from "@/app/page";
+import { ComponentType, destructValue, ids, sync } from "@/app/components/VisualizerApp";
 
 export var matrixHistory: Array<Array<string[][]>> = [];
 export var matrixColorHistory: Array<Array<MatrixColor>> = [];
