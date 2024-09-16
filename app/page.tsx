@@ -181,25 +181,22 @@ export default function Home() {
 
   return (
     <div className="h-screen flex w-screen">
-      <div className="flex" style={{ width: "300px" }}>
-        <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-full">
-          <MonacoEditor code={code} setCode={setCode} />
-          <button
-            className="btn btn-success"
-            onClick={() => {
-              if (running.current) {
-                running.current = false;
-                setButtonMsg("Start");
-              } else {
-                run();
-                setButtonMsg("Stop");
-              }
-            }}
-          >
-            {buttonMsg}
-          </button>
-        </div>
-        <div className="w-1 h-full bg-red-300 cursor-e-resize" onMouseDown={() => {}} onMouseUp={() => {}}></div>
+      <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-min">
+        <MonacoEditor code={code} setCode={setCode} />
+        <button
+          className="btn btn-success"
+          onClick={() => {
+            if (running.current) {
+              running.current = false;
+              setButtonMsg("Start");
+            } else {
+              run();
+              setButtonMsg("Stop");
+            }
+          }}
+        >
+          {buttonMsg}
+        </button>
       </div>
 
       <div className="flex flex-col w-full h-screen">

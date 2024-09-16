@@ -1,12 +1,12 @@
+import { useState, useRef, useEffect } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
-
 import { concatenatedContent } from "./dts.json";
 
 const apiSuggestions = [
   {
     label: "newMatrix",
-    kind: monaco.languages.CompletionItemKind.Function, // Use monaco's enum directly
+    kind: monaco.languages.CompletionItemKind.Function,
     insertText: "const matrix = createMatrix()",
     detail: "createMatrix()",
     documentation: "Creates a new Matrix object.",
@@ -31,23 +31,25 @@ const apiSuggestions = [
 ];
 
 function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFunction }) {
+  const [editorWidth, setEditorWidth] = useState(600); // Initial width of the editor
+  const [startMouseX, setStartMouseX] = useState(0);
+  const [renderedWidth, setRenderedWidth] = useState(editorWidth);
+  const resizing = useRef(false);
+
   const handleEditorWillMount = (monaco: Monaco) => {
-    // Provide TypeScript type definitions
     monaco.languages.typescript.javascriptDefaults.addExtraLib(concatenatedContent, "ts:filename/factories.d.ts");
 
-    // Optionally set compiler options
     monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
       target: monaco.languages.typescript.ScriptTarget.ES2020,
       allowNonTsExtensions: true,
     });
 
-    // Register your completion provider
     monaco.languages.registerCompletionItemProvider("javascript", {
       provideCompletionItems: (model, position) => {
-        const word = model.getWordUntilPosition(position); // Get the current word
+        const word = model.getWordUntilPosition(position);
         const range = {
           startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber, // Ensure it's on the same line
+          endLineNumber: position.lineNumber,
           startColumn: word.startColumn,
           endColumn: word.endColumn,
         };
@@ -55,11 +57,11 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
         const suggestions = apiSuggestions.map(api => ({
           label: api.label,
           kind: api.kind,
-          insertText: api.insertText || api.label, // Fallback to label if insertText is missing
+          insertText: api.insertText || api.label,
           detail: api.detail,
           documentation: api.documentation,
-          sortText: api.sortText || api.label, // Simple sort text based on label
-          range: range, // Correct range on the same line
+          sortText: api.sortText || api.label,
+          range: range,
         }));
 
         return { suggestions };
@@ -67,22 +69,58 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
     });
   };
 
+  // Resize logic
+  useEffect(() => {
+    const handleMove = (ev: MouseEvent) => {
+      if (resizing.current) {
+        const newWidth = editorWidth + (ev.clientX - startMouseX);
+        setRenderedWidth(Math.min(Math.max(newWidth, 300), 900)); // Minimum width 300px
+      }
+    };
+
+    const onMouseUp = () => {
+      resizing.current = false;
+      setEditorWidth(renderedWidth); // Persist the resized width
+    };
+
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [startMouseX, editorWidth, renderedWidth]);
+
   return (
-    <Editor
-      height="100%"
-      language="javascript"
-      theme="vs-dark"
-      value={code}
-      beforeMount={handleEditorWillMount} // Access monaco instance here
-      onChange={v => setCode(v)}
-      options={{
-        fontSize: 16,
-        formatOnType: true,
-        autoClosingBrackets: "always",
-        minimap: { enabled: false },
-        suggestOnTriggerCharacters: true,
-      }}
-    />
+    <div className="flex h-screen">
+      <div style={{ width: `${renderedWidth}px` }}>
+        <Editor
+          height="100%"
+          language="javascript"
+          theme="vs-dark"
+          value={code}
+          beforeMount={handleEditorWillMount}
+          onChange={v => setCode(v)}
+          options={{
+            fontSize: 16,
+            formatOnType: true,
+            autoClosingBrackets: "always",
+            minimap: { enabled: false },
+            suggestOnTriggerCharacters: true,
+          }}
+        />
+      </div>
+
+      {/* Resize handle */}
+      <div
+        className="w-1 h-full bg-gray-300 cursor-ew-resize"
+        onMouseDown={ev => {
+          resizing.current = true;
+          setStartMouseX(ev.clientX);
+        }}
+      ></div>
+    </div>
   );
 }
 

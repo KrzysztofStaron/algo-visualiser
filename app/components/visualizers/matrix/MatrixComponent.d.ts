@@ -1,9 +1,10 @@
 /**
  * Represents the colors used in a matrix.
  * Maps keys to color values.
+ * key: color -> 0: red
  */
 declare interface MatrixColor {
-  [key: number]: string; // Maps numerical indices to color strings
+  [key: string]: string; // Maps numerical indices to color strings
 }
 /**
  * Represents a position in a 2D space.
