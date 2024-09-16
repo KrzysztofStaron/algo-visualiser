@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ids } from "../page";
+import { ids } from "./VisualizerApp";
 
 const Timeline = () => {
   const [maximalize, setMaximalize] = useState(false);
