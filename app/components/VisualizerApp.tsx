@@ -116,7 +116,7 @@ matrix.content([[0, 1, 2]])
   const interval = useRef<NodeJS.Timeout>();
   const maxLen = useRef(0);
 
-  // Quality od life, so user don't have to provide root as an argument
+  // Quality of life, so user don't have to provide root as an argument
   const createArray = (metadata?: any) => {
     return createArrayHandler(register, metadata ?? "");
   };
