@@ -29,6 +29,14 @@ const apiSuggestions = [
     documentation: "Creates a new Array object.",
     sortText: "003",
   },
+  {
+    label: "newStack",
+    kind: monaco.languages.CompletionItemKind.Function,
+    insertText: "const stack = createStack()",
+    detail: "createStack()",
+    documentation: "Creates a new Stack object.",
+    sortText: "004",
+  },
 ];
 
 function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFunction }) {

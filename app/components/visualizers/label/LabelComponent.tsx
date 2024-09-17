@@ -14,7 +14,7 @@ export const labelSync = (maxLen: number) => {
 };
 
 export const createLabelHandler = (register: CallableFunction, metadata: any) => {
-  const id = register(ComponentType.LABEL, metadata);
+  const id = register(ComponentType.LABEL, LabelComponent, metadata);
 
   labelHistory[id] = [];
 

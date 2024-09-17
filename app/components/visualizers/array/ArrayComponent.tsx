@@ -22,7 +22,7 @@ export const arraySync = (maxLen: number) => {
 };
 
 export const createArrayHandler = (register: CallableFunction, metadata: any) => {
-  const id = register(ComponentType.ARRAY, metadata);
+  const id = register(ComponentType.ARRAY, ArrayComponent, metadata);
 
   arrayHistory[id] = [];
   groupHistory[id] = [];
@@ -88,31 +88,29 @@ export const arrayReset = () => {
   arrayHistory = [];
 };
 
-const ArrayComponent = React.forwardRef(
-  ({ frame, id, metadata }: { frame: number; id: number; metadata: any }, ref: any) => {
-    const flexType = (metadata.orientation ?? "") !== "v" ? "" : "flex-col";
+const ArrayComponent = ({ frame, id, metadata }: { frame: number; id: number; metadata: any }, ref: any) => {
+  const flexType = (metadata.orientation ?? "") !== "v" ? "" : "flex-col";
 
-    const data = arrayHistory[id][Math.min(frame, arrayHistory[id].length - 1)];
-    const index = indexHistory[id][Math.min(frame, indexHistory[id].length - 1)];
-    const group = groupHistory[id][Math.min(frame, groupHistory[id].length - 1)];
+  const data = arrayHistory[id][Math.min(frame, arrayHistory[id].length - 1)];
+  const index = indexHistory[id][Math.min(frame, indexHistory[id].length - 1)];
+  const group = groupHistory[id][Math.min(frame, groupHistory[id].length - 1)];
 
-    return (
-      <div>
-        <div className={`flex gap-1 ${flexType}`}>
-          {(data ?? []).map((item: any, i: number) => (
-            <Box
-              key={i}
-              data={item}
-              active={index === i}
-              secoundaryActive={group?.includes(i)}
-              animate={metadata.anim ?? true}
-            />
-          ))}
-        </div>
+  return (
+    <div>
+      <div className={`flex gap-1 ${flexType}`}>
+        {(data ?? []).map((item: any, i: number) => (
+          <Box
+            key={i}
+            data={item}
+            active={index === i}
+            secoundaryActive={group?.includes(i)}
+            animate={metadata.anim ?? true}
+          />
+        ))}
       </div>
-    );
-  }
-);
+    </div>
+  );
+};
 
 const Box = ({
   data,
