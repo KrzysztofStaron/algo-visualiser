@@ -5,7 +5,7 @@ import { ComponentType, destructValue, ids } from "@/app/components/VisualizerAp
 export var stackHistory: any[] = [];
 
 export const createStackHandler = (register: CallableFunction, metadata: any) => {
-  const id = register(ComponentType.STACK, metadata);
+  const id = register(ComponentType.STACK, StackComponent, metadata);
 
   stackHistory[id] = [];
 

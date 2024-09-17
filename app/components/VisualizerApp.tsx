@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import ArrayComponent, {
   arrayHistory,
   arrayReset,
@@ -29,7 +29,7 @@ import dynamic from "next/dynamic";
 import { metadata } from "../layout";
 import { createStackHandler } from "./visualizers/stack/StackComponent";
 
-type ComponentData = { type: ComponentType; id: number; metadata: any };
+type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
 
 export var ids: ComponentData[] = [];
 
@@ -89,11 +89,11 @@ export const sync = () => {
   matrixSync(maxLen);
 };
 
-const register = (component: ComponentType, metadata?: any) => {
+const register = (component: ComponentType, reactComponent: FunctionComponent<any>, metadata?: any) => {
   const id = ids.filter(e => e.type === component).length;
-  console.log({ component: component, index: ids.length, id: id });
+  console.log({ component: component, index: ids.length, id: id, reactComponent: reactComponent });
 
-  ids.push({ type: component, id: id, metadata: metadata ?? {} });
+  ids.push({ type: component, id: id, metadata: metadata ?? {}, reactComponent: reactComponent });
   return id;
 };
 
@@ -223,11 +223,7 @@ matrix.content([[0, 1, 2]])
                   return null;
                 }
 
-                if (e.type === ComponentType.ARRAY) {
-                  return <ArrayComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata} />;
-                } else {
-                  return null;
-                }
+                return <e.reactComponent key={key} id={ids[key].id} frame={frame} metadata={ids[key].metadata} />;
               })}
             </div>
             <div className="flex flex-col items-center justify-center gap-10">
@@ -235,18 +231,8 @@ matrix.content([[0, 1, 2]])
                 if (ids[key].metadata.orientation === "v") {
                   return null;
                 }
-
-                if (e.type === ComponentType.ARRAY) {
-                  return (
-                    <ArrayComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata}></ArrayComponent>
-                  );
-                } else if (e.type === ComponentType.LABEL) {
-                  return <LabelComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata} />;
-                } else if (e.type === ComponentType.MATRIX) {
-                  return <MatrixComponent key={key} id={e.id} frame={frame} metadata={ids[key].metadata} />;
-                } else {
-                  return null;
-                }
+                // Render the component as JSX with props
+                return <e.reactComponent key={key} id={ids[key].id} frame={frame} metadata={ids[key].metadata} />;
               })}
             </div>
           </div>
