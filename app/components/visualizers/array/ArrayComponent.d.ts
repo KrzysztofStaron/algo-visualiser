@@ -49,7 +49,7 @@ interface ArrayObject {
    * - `group`: The group to set in the group history.
    * - `content`: The content to set in the array history.
    *
-   * Each field is optional. If a field is provided, it will update the respective history. If not, the existing data for that field will remain unchanged.
+   * Each field is optional. If a field is provided, it will update the respective history.
    *
    * @param data - An object containing the fields to update:
    *   - `index` (optional): A number representing the index to set.
