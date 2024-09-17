@@ -26,6 +26,8 @@ import MatrixComponent, {
 const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
 import SpeedModulator from "./SpeedModulator";
 import dynamic from "next/dynamic";
+import { metadata } from "../layout";
+import { createStackHandler } from "./visualizers/stack/StackComponent";
 
 type ComponentData = { type: ComponentType; id: number; metadata: any };
 
@@ -44,6 +46,7 @@ export enum ComponentType {
   ARRAY = "Array",
   LABEL = "Label",
   MATRIX = "Matrix",
+  STACK = "Stack",
 }
 
 const calcLen = () => {
@@ -124,6 +127,10 @@ matrix.content([[0, 1, 2]])
 
   const createMatrix = (metadata: any) => {
     return createMatrixHandler(register, metadata ?? "");
+  };
+
+  const createStack = (metadata: any) => {
+    return createStackHandler(register, metadata ?? "");
   };
 
   // function that runs every frame
