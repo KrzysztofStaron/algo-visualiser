@@ -1,7 +1,7 @@
 "use client";
 
 import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import ArrayComponent, {
+import {
   arrayHistory,
   arrayReset,
   indexHistory,
@@ -9,13 +9,8 @@ import ArrayComponent, {
   createArrayHandler,
   arraySync,
 } from "./visualizers/array/ArrayComponent";
-import LabelComponent, {
-  createLabelHandler,
-  labelHistory,
-  labelSync,
-  resetLabel,
-} from "./visualizers/label/LabelComponent";
-import MatrixComponent, {
+import { createLabelHandler, labelHistory, labelSync, resetLabel } from "./visualizers/label/LabelComponent";
+import {
   createMatrixHandler,
   matrixColorHistory,
   matrixGroupHistory,
@@ -26,8 +21,7 @@ import MatrixComponent, {
 const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
 import SpeedModulator from "./SpeedModulator";
 import dynamic from "next/dynamic";
-import { metadata } from "../layout";
-import { createStackHandler } from "./visualizers/stack/StackComponent";
+import { createStackHandler, resetStack, stackHistory, syncStack } from "./visualizers/stack/StackComponent";
 
 type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
 
@@ -69,6 +63,10 @@ const calcLen = () => {
     );
   }
 
+  for (let id of ids.filter(e => e.type === ComponentType.STACK).map(e => e.id)) {
+    max = Math.max(max, stackHistory[id].length ?? 0);
+  }
+
   return max;
 };
 
@@ -78,6 +76,7 @@ const reset = () => {
   arrayReset();
   resetLabel();
   resetMatrix();
+  resetStack();
 };
 
 export const sync = () => {
@@ -87,6 +86,7 @@ export const sync = () => {
   arraySync(maxLen);
   labelSync(maxLen);
   matrixSync(maxLen);
+  syncStack(maxLen);
 };
 
 const register = (component: ComponentType, reactComponent: FunctionComponent<any>, metadata?: any) => {

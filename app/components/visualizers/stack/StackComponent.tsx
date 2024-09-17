@@ -2,7 +2,7 @@
 
 import { ComponentType, destructValue, ids } from "@/app/components/VisualizerApp";
 
-export var stackHistory: any[] = [];
+export var stackHistory: Array<Array<(number | string)[]>> = [];
 
 export const createStackHandler = (register: CallableFunction, metadata: any) => {
   const id = register(ComponentType.STACK, StackComponent, metadata);
@@ -13,8 +13,11 @@ export const createStackHandler = (register: CallableFunction, metadata: any) =>
     push: (val: string) => {
       stackHistory[id].push([...(stackHistory[id].at(-1) ?? []), destructValue(val)]);
     },
-    shift: () => {
-      stackHistory[id].push([...(stackHistory[id].at(-1) ?? [])].shift());
+    pop: () => {
+      // Changed to pop for typical stack behavior
+      const currentStack = [...(stackHistory[id].at(-1) ?? [])];
+      currentStack.pop(); // Remove the top element of the stack
+      stackHistory[id].push(currentStack);
     },
   };
 };
@@ -24,7 +27,7 @@ export const resetStack = () => {
 };
 
 export const syncStack = (maxLen: number) => {
-  for (let i of ids.filter(e => e.type === ComponentType.BASE).map(e => e.id)) {
+  for (let i of ids.filter(e => e.type === ComponentType.STACK).map(e => e.id)) {
     while (stackHistory[i].length < maxLen) {
       stackHistory[i].push(stackHistory[i].at(-1)!);
     }
@@ -32,5 +35,5 @@ export const syncStack = (maxLen: number) => {
 };
 
 const StackComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
-  return <p>Stack Branch</p>;
+  return <p>{stackHistory[id][frame]?.at(-1) ?? ""}</p>;
 };
