@@ -32,5 +32,5 @@ export const syncStack = (maxLen: number) => {
 };
 
 const StackComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
-  return <p>Stack</p>;
+  return <p>Stack Branch</p>;
 };
