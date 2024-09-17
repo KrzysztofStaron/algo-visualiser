@@ -55,10 +55,20 @@ declare interface MatrixObject {
   group(data: Array<Position>, synchronize?: boolean): void;
 
   /**
-   * Sets the frame of the matrix.
+   * Sets the frame data in the matrix object.
    *
-   * @param data An object containing content, colors, and group data for the matrix.
-   * @param synchronize Optional flag to trigger synchronization after setting the frame.
+   * The `data` parameter can include:
+   * - `content`: A 2D array of strings representing the matrix content.
+   * - `colors`: An object mapping indices to color values for the matrix.
+   * - `group`: An array of positions representing the grouping in the matrix.
+   *
+   * Each field is optional. If a field is provided, it will update the respective aspect of the matrix. If not, the existing data for that field will remain unchanged.
+   *
+   * @param data - An object containing the fields to update:
+   *   - `content` (optional): A 2D array of strings representing the matrix content. Example: `[['A', 'B'], ['C', 'D']]`
+   *   - `colors` (optional): An object mapping numerical indices to color values. Example: `{0: 'red', 1: 'blue'}`.
+   *   - `group` (optional): An array of positions representing the grouping of elements. Each position is a tuple with X and Y coordinates. Example: `[[0, 0], [1, 1]]`.
+   * @param synchronize - Optional flag to trigger synchronization after setting the frame data. Defaults to `true`.
    */
   frame(data: { content?: string[][]; colors?: MatrixColor; group?: Position[] }, synchronize?: boolean): void;
 }
