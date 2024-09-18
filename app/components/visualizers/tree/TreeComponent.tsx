@@ -1,5 +1,3 @@
-"use client";
-
 import { ComponentType, ids, resetFunctions, syncFunctions } from "@/app/components/VisualizerApp";
 
 // Define the TreeNode class
@@ -37,25 +35,21 @@ class Tree {
   }
 }
 
-// Tree history array for state management
 export var treeHis: Array<Array<Tree>> = [];
 
-// Create a tree handler for managing the tree component's state
 export const createTreeHandler = (register: CallableFunction, metadata: any) => {
   const id = register(ComponentType.TREE, TreeComponent, metadata);
 
-  // Initialize the history for the new tree
   treeHis[id] = [];
 
   return {};
 };
 
-// Reset the tree history
 export const resetTree = () => {
   console.log("resetTree");
   treeHis = [];
 };
-// Sync the base tree states across all frames
+
 export const syncTree = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === ComponentType.TREE).map(e => e.id)) {
     while (treeHis[i].length < maxLen) {
@@ -65,7 +59,6 @@ export const syncTree = (maxLen: number) => {
 };
 
 let pushed = false;
-// Define the TreeComponent for rendering the tree
 const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
   if (pushed === false) {
     resetFunctions.push(resetTree);

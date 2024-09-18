@@ -1,5 +1,3 @@
-"use client";
-
 import { ComponentType, destructValue, ids, resetFunctions, syncFunctions } from "@/app/components/VisualizerApp";
 
 // Initialize stackHistory with type safety
