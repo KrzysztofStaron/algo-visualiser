@@ -26,6 +26,9 @@ import { createTreeHandler, resetTree, syncTree } from "./visualizers/tree/TreeC
 
 type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
 
+export let resetFunctions: CallableFunction[] = [];
+export let syncFunctions: CallableFunction[] = [];
+
 export var ids: ComponentData[] = [];
 
 export const destructValue = (lambda: any) => {
@@ -75,11 +78,12 @@ const calcLen = () => {
 const reset = () => {
   ids = [];
 
-  arrayReset();
-  resetLabel();
+  // for some reason it must be reseted
   resetMatrix();
-  resetStack();
-  resetTree();
+
+  resetFunctions.forEach(lambda => {
+    lambda();
+  });
 };
 
 export const sync = () => {

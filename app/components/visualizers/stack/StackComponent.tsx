@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentType, destructValue, ids } from "@/app/components/VisualizerApp";
+import { ComponentType, destructValue, ids, resetFunctions, syncFunctions } from "@/app/components/VisualizerApp";
 
 // Initialize stackHistory with type safety
 export var stackHistory: Array<Array<(number | string)[]>> = [];
@@ -79,7 +79,13 @@ export const syncStack = (maxLen: number) => {
  * @param metadata - Metadata for the stack component.
  * @returns JSX Element representing the stack.
  */
+let pushed = false;
 const StackComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
+  if (pushed === false) {
+    resetFunctions.push(resetStack);
+    pushed = true;
+  }
+
   // Ensure the frame is within bounds
   const stackFrame = stackHistory[id]?.[Math.min(frame, stackHistory[id].length - 1)] ?? [];
 

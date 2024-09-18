@@ -1,5 +1,5 @@
 import React from "react";
-import { ComponentType, destructValue, ids, sync } from "@/app/components/VisualizerApp";
+import { ComponentType, destructValue, ids, resetFunctions, sync, syncFunctions } from "@/app/components/VisualizerApp";
 
 export var arrayHistory: Array<Array<string[]>> = [];
 export var groupHistory: Array<Array<number[]>> = [];
@@ -88,7 +88,14 @@ export const arrayReset = () => {
   arrayHistory = [];
 };
 
+let pushed = false;
+
 const ArrayComponent = ({ frame, id, metadata }: { frame: number; id: number; metadata: any }, ref: any) => {
+  if (pushed === false) {
+    resetFunctions.push(arrayReset);
+    pushed = true;
+  }
+
   const flexType = (metadata.orientation ?? "") !== "v" ? "" : "flex-col";
 
   const data = arrayHistory[id][Math.min(frame, arrayHistory[id].length - 1)];

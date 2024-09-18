@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ComponentType, destructValue, ids, sync } from "@/app/components/VisualizerApp";
+import { ComponentType, destructValue, ids, resetFunctions, sync, syncFunctions } from "@/app/components/VisualizerApp";
 
 export var matrixHistory: Array<Array<string[][]>> = [];
 export var matrixColorHistory: Array<Array<MatrixColor>> = [];
@@ -100,7 +100,14 @@ export const resetMatrix = () => {
   matrixGroupHistory = [];
 };
 
+let pushed = false;
 const MatrixComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
+  if (pushed === false) {
+    resetFunctions.push(resetMatrix);
+    pushed = true;
+    return;
+  }
+
   const content = matrixHistory[id][Math.min(frame, matrixHistory[id].length - 1)] ?? [];
   const rotatedContent = (content[0] ?? []).map((_, colIndex) => content.map(row => row[colIndex]));
   const group = matrixGroupHistory[id][Math.min(frame, matrixGroupHistory[id].length - 1)] ?? [];
