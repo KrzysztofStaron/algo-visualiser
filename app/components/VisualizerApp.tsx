@@ -22,6 +22,7 @@ const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
 import SpeedModulator from "./SpeedModulator";
 import dynamic from "next/dynamic";
 import { createStackHandler, resetStack, stackHistory, syncStack } from "./visualizers/stack/StackComponent";
+import { createTreeHandler, resetTree, syncTree } from "./visualizers/tree/TreeComponent";
 
 type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
 
@@ -36,11 +37,12 @@ export const destructValue = (lambda: any) => {
 };
 
 export enum ComponentType {
-  BASE,
+  BASE = "Base",
   ARRAY = "Array",
   LABEL = "Label",
   MATRIX = "Matrix",
   STACK = "Stack",
+  TREE = "Tree",
 }
 
 const calcLen = () => {
@@ -77,6 +79,7 @@ const reset = () => {
   resetLabel();
   resetMatrix();
   resetStack();
+  resetTree();
 };
 
 export const sync = () => {
@@ -87,6 +90,7 @@ export const sync = () => {
   labelSync(maxLen);
   matrixSync(maxLen);
   syncStack(maxLen);
+  syncTree(maxLen);
 };
 
 const register = (component: ComponentType, reactComponent: FunctionComponent<any>, metadata?: any) => {
@@ -131,6 +135,10 @@ matrix.content([[0, 1, 2]])
 
   const createStack = (metadata: any) => {
     return createStackHandler(register, metadata ?? "");
+  };
+
+  const createTree = (metadata: any) => {
+    return createTreeHandler(register, metadata ?? "");
   };
 
   // function that runs every frame
