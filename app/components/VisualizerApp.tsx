@@ -7,9 +7,9 @@ import {
   indexHistory,
   groupHistory,
   createArrayHandler,
-  arraySync,
+  syncArray,
 } from "./visualizers/array/ArrayComponent";
-import { createLabelHandler, labelHistory, labelSync, resetLabel } from "./visualizers/label/LabelComponent";
+import { createLabelHandler, labelHistory, syncLabel, resetLabel } from "./visualizers/label/LabelComponent";
 import {
   createMatrixHandler,
   matrixColorHistory,
@@ -78,7 +78,7 @@ const calcLen = () => {
 const reset = () => {
   ids = [];
 
-  // for some reason it must be reseted
+  // for some reason it must be reseted manually
   resetMatrix();
 
   resetFunctions.forEach(lambda => {
@@ -90,11 +90,9 @@ export const sync = () => {
   const maxLen = calcLen();
   console.log(`sync(), maxLen: ${maxLen}`);
 
-  arraySync(maxLen);
-  labelSync(maxLen);
-  matrixSync(maxLen);
-  syncStack(maxLen);
-  syncTree(maxLen);
+  syncFunctions.forEach(lambda => {
+    lambda(maxLen);
+  });
 };
 
 const register = (component: ComponentType, reactComponent: FunctionComponent<any>, metadata?: any) => {

@@ -5,7 +5,7 @@ import { ComponentType, destructValue, ids, resetFunctions, sync, syncFunctions 
 
 export var labelHistory: Array<Array<string>> = [];
 
-export const labelSync = (maxLen: number) => {
+export const syncLabel = (maxLen: number) => {
   for (let i of ids.filter(e => e.type === ComponentType.LABEL).map(e => e.id)) {
     while (labelHistory[i].length < maxLen) {
       labelHistory[i].push(labelHistory[i].at(-1)!);
@@ -38,6 +38,8 @@ let pushed = false;
 const LabelComponent: React.FC<{ id: number; frame: number; metadata: any }> = ({ id, frame, metadata }) => {
   if (pushed === false) {
     resetFunctions.push(resetLabel);
+    syncFunctions.push(syncLabel);
+
     pushed = true;
   }
 

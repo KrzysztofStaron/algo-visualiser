@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentType, ids, resetFunctions } from "@/app/components/VisualizerApp";
+import { ComponentType, ids, resetFunctions, syncFunctions } from "@/app/components/VisualizerApp";
 
 // Define the TreeNode class
 class TreeNode {
@@ -69,6 +69,7 @@ let pushed = false;
 const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
   if (pushed === false) {
     resetFunctions.push(resetTree);
+    syncFunctions.push(syncTree);
     pushed = true;
   }
 

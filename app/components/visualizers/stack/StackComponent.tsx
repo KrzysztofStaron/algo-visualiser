@@ -83,6 +83,8 @@ let pushed = false;
 const StackComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
   if (pushed === false) {
     resetFunctions.push(resetStack);
+    syncFunctions.push(syncStack);
+
     pushed = true;
   }
 

@@ -104,6 +104,8 @@ let pushed = false;
 const MatrixComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
   if (pushed === false) {
     resetFunctions.push(resetMatrix);
+    syncFunctions.push(matrixSync);
+
     pushed = true;
     return;
   }
