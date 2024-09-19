@@ -128,8 +128,13 @@ export default function VisualizerApp() {
   const [code, setCode] = useState(`const tree = createTree()
 
 const t = new TreeNode("root");
-t.add(new TreeNode(1))
-t.add(new TreeNode(2))
+t.add([1, [2, 3]])
+t.add(new TreeNode(6))
+t.add(new TreeNode(8))
+
+tree.content(t)
+
+t.add(9)
 
 tree.content(t)
 
@@ -214,7 +219,7 @@ tree.content(t)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (startButtonRef.current && process.env.NODE_ENV !== "production") {
-        startButtonRef.current.click();
+        //startButtonRef.current.click();
       }
     }, 1000);
 

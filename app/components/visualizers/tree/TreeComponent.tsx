@@ -1,17 +1,55 @@
 import React, { useEffect } from "react";
 import { ComponentType, ids, resetFunctions, syncFunctions } from "../../VisualizerApp";
 
+// new TreeNodeHandler([label, [children]])
+
 export class TreeNodeHandler {
   label: string;
   children: TreeNodeHandler[];
 
   constructor(data: any) {
-    this.label = data;
-    this.children = [];
+    if (Array.isArray(data)) {
+      this.label = data[0];
+      this.children = data[1].map((e: any) => new TreeNodeHandler(e));
+    } else {
+      this.label = data;
+      this.children = [];
+    }
   }
 
   add(data: any) {
-    this.children.push(new TreeNodeHandler(data));
+    if (data instanceof TreeNodeHandler) {
+      this.children.push(data);
+    } else if (typeof data === "number" || typeof data === "string") {
+      this.children.push(new TreeNodeHandler(data));
+    } else if (Array.isArray(data)) {
+      this.addArray(data);
+      // Add all elements of the array as children
+      console.log("array: ", data);
+    } else {
+      throw new Error("Unsupported data type");
+    }
+  }
+
+  private addArray(array: any) {
+    if (array.length === 0) return;
+
+    // The first element of the array is the label for this node
+    const node = new TreeNodeHandler(array[0]);
+
+    // Add each item in the array
+    array[1].forEach((item: string | string[]) => {
+      if (Array.isArray(item)) {
+        // Recursively add children if item is an array
+        node.addArray(item);
+      } else {
+        // Add item directly as a child
+        node.add(item);
+      }
+    });
+
+    // Add the newly created node as a child of the current node
+    this.children.push(node);
   }
 
   remove(data: any) {
@@ -33,12 +71,13 @@ export const createTreeHandler = (register: CallableFunction, metadata: any) => 
 
   return {
     content: (data: TreeNodeHandler) => {
-      treeHis[id].push(data);
+      treeHis[id].push({ ...(data as Object) } as TreeNodeHandler);
     },
   };
 };
 
 export const resetTree = () => {
+  console.log("treeHis: ", treeHis);
   treeHis = [];
 };
 
@@ -59,36 +98,9 @@ const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; met
     pushed = true;
   }
 
-  const data = {
-    label: "root",
-    children: [
-      {
-        label: "adam",
-        children: [
-          {
-            label: "adam-child",
-            children: [
-              {
-                label: "adam-child-child",
-              },
-            ],
-          },
-          {
-            label: "adam-child-2",
-          },
-        ],
-      },
-      {
-        label: "eva",
-      },
-    ],
-  };
+  const data = treeHis[id]?.[Math.min(frame, treeHis[id].length - 1)] ?? [];
 
   const levels = getLevels(data);
-  const maxWidthByLevel = getMaxWidthByLevel(levels);
-  console.log("maxW: ", maxWidthByLevel);
-  console.log("levels: ", levels);
-  console.log("data:", data);
 
   useEffect(() => {
     const handleResize = () => {
@@ -107,6 +119,13 @@ const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; met
     window.addEventListener("resize", handleResize);
 
     return () => {
+      Object.keys(levels).forEach(level => {
+        const elements = document.querySelectorAll(`.node-${level}`);
+
+        // Set all nodes at this level to the maximum width
+        elements.forEach(el => el.removeAttribute("style"));
+      });
+
       window.removeEventListener("resize", handleResize);
     };
   }, [levels]);
@@ -138,10 +157,12 @@ const TreeRow = ({ node, level }: { node: any; level: number }) => {
   if (!node) return null;
 
   return (
-    <div className={`flex flex-col items-center m-4 text-black node-${level}`}>
-      <div className="bg-gray-300 p-5 rounded-full text-center truncate">{node.label}</div>
+    <div className={`flex flex-col items-center text-white node-${level} gap-2`}>
+      <p className="bg-stone-900 p-3 px-5 rounded-full text-center truncate max-w-48 text-lg font-semibold border-black border-4">
+        {node.label}
+      </p>
       {node.children && (
-        <div className="flex flex-row justify-center border-t-2">
+        <div className="flex flex-row border-t-2 pt-2 gap-4 border-stone-950">
           {node.children.map((child: any, index: number) => (
             <TreeRow key={index} node={child} level={level + 1} />
           ))}
@@ -161,18 +182,4 @@ const getLevels = (node: any, level = 0, levels: Record<number, any[]> = {}): Re
   }
 
   return levels;
-};
-
-// Function to calculate the maximum width for each level
-const getMaxWidthByLevel = (levels: Record<number, any[]>): Record<number, number> => {
-  const maxWidthByLevel: Record<number, number> = {};
-
-  Object.keys(levels).forEach((level: any) => {
-    const width = Math.max(
-      ...levels[level].map((node: any) => node.label.length * 10) // Approximation for width
-    );
-    maxWidthByLevel[level] = width + 20; // Add padding for aesthetics
-  });
-
-  return maxWidthByLevel;
 };
