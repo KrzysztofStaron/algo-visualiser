@@ -7,7 +7,6 @@ import data from "./dts.json";
 const apiSuggestions = [
   {
     label: "newMatrix",
-    kind: monaco.languages.CompletionItemKind.Function,
     insertText: "const matrix = createMatrix()",
     detail: "createMatrix()",
     documentation: "Creates a new Matrix object.",
@@ -15,7 +14,6 @@ const apiSuggestions = [
   },
   {
     label: "newLabel",
-    kind: monaco.languages.CompletionItemKind.Function,
     insertText: "const label = createLabel()",
     detail: "createLabel()",
     documentation: "Creates a new Label object.",
@@ -23,7 +21,6 @@ const apiSuggestions = [
   },
   {
     label: "newArray",
-    kind: monaco.languages.CompletionItemKind.Function,
     insertText: "const arr = createArray()",
     detail: "createArray()",
     documentation: "Creates a new Array object.",
@@ -31,11 +28,17 @@ const apiSuggestions = [
   },
   {
     label: "newStack",
-    kind: monaco.languages.CompletionItemKind.Function,
     insertText: "const stack = createStack()",
     detail: "createStack()",
     documentation: "Creates a new Stack object.",
     sortText: "004",
+  },
+  {
+    label: "newTree",
+    insertText: "const tree = createTree()",
+    detail: "createTree()",
+    documentation: "Creates a new Tree object.",
+    sortText: "005",
   },
 ];
 
@@ -65,7 +68,7 @@ function MonacoEditor({ code, setCode }: { code: string; setCode: CallableFuncti
 
         const suggestions = apiSuggestions.map(api => ({
           label: api.label,
-          kind: api.kind,
+          kind: monaco.languages.CompletionItemKind.Function,
           insertText: api.insertText || api.label,
           detail: api.detail,
           documentation: api.documentation,

@@ -1,10 +1,7 @@
-// Unsafe attempt to render the JSX string
-const Page = () => {
-  return <p>Hello</p>;
+import React from "react";
+
+const page = () => {
+  return <div>page</div>;
 };
 
-const grid = () => {};
-
-const gridEl = () => {};
-
-export default Page;
+export default page;

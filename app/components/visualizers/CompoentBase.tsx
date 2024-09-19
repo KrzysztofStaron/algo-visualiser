@@ -5,7 +5,7 @@ import { ComponentType, ids } from "@/app/components/VisualizerApp";
 export var his: any[] = [];
 
 export const createBase_handler = (register: CallableFunction, metadata: any) => {
-  const id = register("", metadata);
+  const id = register("", BaseComponent, metadata);
 
   his[id] = [];
 

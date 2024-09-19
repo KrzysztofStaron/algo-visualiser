@@ -1,10 +1,14 @@
 # How to add new Component:
 
-- add the resetfunction to reset()
-- add the sync function to sync()
 - add the components history to calcLen()
+
+- add the resetfunction to resetFunctions
+- add the sync function to syncFunctions
+
 - add handler to page.tsx
+
 - Add the component the ComponentType enum
+
 - Register the component
 
 - create d.ts file

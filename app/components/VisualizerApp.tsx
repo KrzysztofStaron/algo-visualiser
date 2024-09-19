@@ -1,47 +1,64 @@
 "use client";
 
-import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import {
-  arrayHistory,
-  arrayReset,
-  indexHistory,
-  groupHistory,
-  createArrayHandler,
-  arraySync,
-} from "./visualizers/array/ArrayComponent";
-import { createLabelHandler, labelHistory, labelSync, resetLabel } from "./visualizers/label/LabelComponent";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import SpeedModulator from "./SpeedModulator";
+import { arrayHistory, groupHistory, indexHistory, createArrayHandler } from "./visualizers/array/ArrayComponent";
+import { createLabelHandler, labelHistory } from "./visualizers/label/LabelComponent";
+import { createStackHandler, stackHistory } from "./visualizers/stack/StackComponent";
+import { createTreeHandler, treeHis, TreeNodeHandler } from "./visualizers/tree/TreeComponent";
 import {
   createMatrixHandler,
   matrixColorHistory,
   matrixGroupHistory,
   matrixHistory,
-  matrixSync,
   resetMatrix,
 } from "./visualizers/matrix/MatrixComponent";
-const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
-import SpeedModulator from "./SpeedModulator";
-import dynamic from "next/dynamic";
-import { createStackHandler, resetStack, stackHistory, syncStack } from "./visualizers/stack/StackComponent";
 
-type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
+const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
+
+type ComponentData = {
+  type: ComponentType;
+  id: number;
+  metadata: any;
+  reactComponent: FunctionComponent<any>;
+};
+
+export let resetFunctions: CallableFunction[] = [];
+export let syncFunctions: CallableFunction[] = [];
 
 export var ids: ComponentData[] = [];
 
-export const destructValue = (lambda: any) => {
-  if (typeof lambda === "function") {
-    return lambda();
-  }
-
-  return lambda;
-};
+class TreeNode extends TreeNodeHandler {}
 
 export enum ComponentType {
-  BASE,
+  BASE = "Base",
   ARRAY = "Array",
   LABEL = "Label",
   MATRIX = "Matrix",
   STACK = "Stack",
+  TREE = "Tree",
 }
+
+const reset = () => {
+  ids = [];
+
+  // for some reason it must be reseted manually
+  resetMatrix();
+
+  resetFunctions.forEach(lambda => {
+    lambda();
+  });
+};
+
+export const sync = () => {
+  const maxLen = calcLen();
+  console.log(`sync(), maxLen: ${maxLen}`);
+
+  syncFunctions.forEach(lambda => {
+    lambda(maxLen);
+  });
+};
 
 const calcLen = () => {
   let max = 0;
@@ -67,26 +84,40 @@ const calcLen = () => {
     max = Math.max(max, stackHistory[id].length ?? 0);
   }
 
+  for (let id of ids.filter(e => e.type === ComponentType.TREE).map(e => e.id)) {
+    max = Math.max(max, treeHis[id].length ?? 0);
+  }
+
   return max;
 };
 
-const reset = () => {
-  ids = [];
+export const destructValue = (lambda: any) => {
+  if (typeof lambda === "function") {
+    return lambda();
+  }
 
-  arrayReset();
-  resetLabel();
-  resetMatrix();
-  resetStack();
+  return lambda;
 };
 
-export const sync = () => {
-  const maxLen = calcLen();
-  console.log(`sync(), maxLen: ${maxLen}`);
+// Quality of life, so user don't have to provide root as an argument
+const createArray = (metadata?: any) => {
+  return createArrayHandler(register, metadata ?? "");
+};
 
-  arraySync(maxLen);
-  labelSync(maxLen);
-  matrixSync(maxLen);
-  syncStack(maxLen);
+const createLabel = (metadata: any) => {
+  return createLabelHandler(register, metadata ?? "");
+};
+
+const createMatrix = (metadata: any) => {
+  return createMatrixHandler(register, metadata ?? "");
+};
+
+const createStack = (metadata: any) => {
+  return createStackHandler(register, metadata ?? "");
+};
+
+const createTree = (metadata: any) => {
+  return createTreeHandler(register, metadata ?? "");
 };
 
 const register = (component: ComponentType, reactComponent: FunctionComponent<any>, metadata?: any) => {
@@ -98,16 +129,24 @@ const register = (component: ComponentType, reactComponent: FunctionComponent<an
 };
 
 export default function VisualizerApp() {
-  const [code, setCode] = useState(`const matrix = createMatrix()
+  const [code, setCode] = useState(`const tree = createTree()
 
-matrix.colors({ 0: "bg-red-400", 1: "green", 2: "#ff00ff" })
-matrix.content([[0, 1, 2]])
+const t = new TreeNode("root");
+t.add([1, [2, 3]])
+t.add(new TreeNode(6))
+t.add(new TreeNode(8))
+
+tree.content(t)
+
+t.add(9)
+
+tree.content(t)
+
 `);
 
   const [speed, setSpeed] = useState(150);
 
   const running = useRef(false);
-
   const [buttonMsg, setButtonMsg] = useState("Start");
 
   const [frame, setFrame] = useState(0);
@@ -116,22 +155,8 @@ matrix.content([[0, 1, 2]])
   const interval = useRef<NodeJS.Timeout>();
   const maxLen = useRef(0);
 
-  // Quality of life, so user don't have to provide root as an argument
-  const createArray = (metadata?: any) => {
-    return createArrayHandler(register, metadata ?? "");
-  };
-
-  const createLabel = (metadata: any) => {
-    return createLabelHandler(register, metadata ?? "");
-  };
-
-  const createMatrix = (metadata: any) => {
-    return createMatrixHandler(register, metadata ?? "");
-  };
-
-  const createStack = (metadata: any) => {
-    return createStackHandler(register, metadata ?? "");
-  };
+  // Reference to the button
+  const startButtonRef = useRef<HTMLButtonElement>(null);
 
   // function that runs every frame
   const executeFrame = () => {
@@ -194,11 +219,24 @@ matrix.content([[0, 1, 2]])
     interval.current = setInterval(executeFrame, speed);
   }, [speed]);
 
+  // Automatically click the start button 1 second after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (startButtonRef.current && process.env.NODE_ENV !== "production") {
+        //startButtonRef.current.click();
+      }
+    }, 1000);
+
+    // Cleanup the timer on unmount
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="h-screen flex w-screen">
       <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-min">
         <MonacoEditor code={code} setCode={setCode} />
         <button
+          ref={startButtonRef}
           className="btn btn-success"
           onClick={() => {
             if (running.current) {
