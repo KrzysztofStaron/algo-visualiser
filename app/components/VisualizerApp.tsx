@@ -1,8 +1,9 @@
 "use client";
 
-import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
-
-import { arrayHistory, indexHistory, groupHistory, createArrayHandler } from "./visualizers/array/ArrayComponent";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import SpeedModulator from "./SpeedModulator";
+import { arrayHistory, groupHistory, indexHistory, createArrayHandler } from "./visualizers/array/ArrayComponent";
 import { createLabelHandler, labelHistory } from "./visualizers/label/LabelComponent";
 import { createStackHandler, stackHistory } from "./visualizers/stack/StackComponent";
 import { createTreeHandler, TreeNodeHandler } from "./visualizers/tree/TreeComponent";
@@ -15,10 +16,13 @@ import {
 } from "./visualizers/matrix/MatrixComponent";
 
 const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
-import SpeedModulator from "./SpeedModulator";
-import dynamic from "next/dynamic";
 
-type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
+type ComponentData = {
+  type: ComponentType;
+  id: number;
+  metadata: any;
+  reactComponent: FunctionComponent<any>;
+};
 
 export let resetFunctions: CallableFunction[] = [];
 export let syncFunctions: CallableFunction[] = [];
@@ -134,7 +138,6 @@ tree.content(t)
   const [speed, setSpeed] = useState(150);
 
   const running = useRef(false);
-
   const [buttonMsg, setButtonMsg] = useState("Start");
 
   const [frame, setFrame] = useState(0);
@@ -142,6 +145,9 @@ tree.content(t)
 
   const interval = useRef<NodeJS.Timeout>();
   const maxLen = useRef(0);
+
+  // Reference to the button
+  const startButtonRef = useRef<HTMLButtonElement>(null);
 
   // function that runs every frame
   const executeFrame = () => {
@@ -204,11 +210,24 @@ tree.content(t)
     interval.current = setInterval(executeFrame, speed);
   }, [speed]);
 
+  // Automatically click the start button 1 second after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (startButtonRef.current) {
+        startButtonRef.current.click();
+      }
+    }, 1000);
+
+    // Cleanup the timer on unmount
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="h-screen flex w-screen">
       <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-min">
         <MonacoEditor code={code} setCode={setCode} />
         <button
+          ref={startButtonRef}
           className="btn btn-success"
           onClick={() => {
             if (running.current) {
