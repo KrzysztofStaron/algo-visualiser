@@ -71,7 +71,9 @@ export const createTreeHandler = (register: CallableFunction, metadata: any) => 
 
   return {
     content: (data: TreeNodeHandler) => {
-      treeHis[id].push({ ...(data as Object) } as TreeNodeHandler);
+      // Create a deep clone of the TreeNodeHandler instance
+      const deepClone = structuredClone(data);
+      treeHis[id].push(deepClone);
     },
   };
 };

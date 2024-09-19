@@ -1,3 +1,5 @@
+type NodeAsArray = [string, [[key: string | TreeNode | NodeAsArray]]];
+
 /**
  * Represents a node in the tree.
  */
@@ -17,7 +19,7 @@ declare class TreeNode {
    *
    * @param data The data to be added to the new child node.
    */
-  add(data: any): void;
+  add(data: TreeNode | NodeAsArray): void;
 
   /**
    * Removes a child node containing the specified data.

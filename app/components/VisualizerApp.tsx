@@ -6,7 +6,7 @@ import SpeedModulator from "./SpeedModulator";
 import { arrayHistory, groupHistory, indexHistory, createArrayHandler } from "./visualizers/array/ArrayComponent";
 import { createLabelHandler, labelHistory } from "./visualizers/label/LabelComponent";
 import { createStackHandler, stackHistory } from "./visualizers/stack/StackComponent";
-import { createTreeHandler, TreeNodeHandler } from "./visualizers/tree/TreeComponent";
+import { createTreeHandler, treeHis, TreeNodeHandler } from "./visualizers/tree/TreeComponent";
 import {
   createMatrixHandler,
   matrixColorHistory,
@@ -82,6 +82,10 @@ const calcLen = () => {
 
   for (let id of ids.filter(e => e.type === ComponentType.STACK).map(e => e.id)) {
     max = Math.max(max, stackHistory[id].length ?? 0);
+  }
+
+  for (let id of ids.filter(e => e.type === ComponentType.TREE).map(e => e.id)) {
+    max = Math.max(max, treeHis[id].length ?? 0);
   }
 
   return max;
