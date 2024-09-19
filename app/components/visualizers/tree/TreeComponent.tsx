@@ -1,52 +1,44 @@
-import { ComponentType, ids, resetFunctions, syncFunctions } from "@/app/components/VisualizerApp";
+import { ComponentType, ids, resetFunctions, syncFunctions } from "../../VisualizerApp";
+import React from "react";
 
-// Define the TreeNode class
-class TreeNode {
-  data: any;
-  children: TreeNode[];
+export class TreeNodeHandler {
+  data: string;
+  children: TreeNodeHandler[];
 
   constructor(data: any) {
     this.data = data;
     this.children = [];
   }
 
-  // Add a new child node
   add(data: any) {
-    this.children.push(new TreeNode(data));
+    this.children.push(new TreeNodeHandler(data));
   }
 
-  // Remove a child node by data
   remove(data: any) {
     this.children = this.children.filter(node => node.data !== data);
   }
-}
 
-// Define the Tree class
-class Tree {
-  root: TreeNode | null;
-
-  constructor() {
-    this.root = null;
-  }
-
-  // Add a node to the root (basic structure)
-  addRoot(data: any) {
-    this.root = new TreeNode(data);
+  traverse(callback: (node: TreeNodeHandler) => void) {
+    callback(this);
+    this.children.forEach(child => child.traverse(callback));
   }
 }
 
-export var treeHis: Array<Array<Tree>> = [];
+export var treeHis: Array<Array<TreeNodeHandler>> = [];
 
 export const createTreeHandler = (register: CallableFunction, metadata: any) => {
   const id = register(ComponentType.TREE, TreeComponent, metadata);
 
   treeHis[id] = [];
 
-  return {};
+  return {
+    content: (data: TreeNodeHandler) => {
+      treeHis[id].push(data);
+    },
+  };
 };
 
 export const resetTree = () => {
-  console.log("resetTree");
   treeHis = [];
 };
 
@@ -59,12 +51,16 @@ export const syncTree = (maxLen: number) => {
 };
 
 let pushed = false;
+
 const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; metadata: any }) => {
-  if (pushed === false) {
+  if (!pushed) {
     resetFunctions.push(resetTree);
     syncFunctions.push(syncTree);
     pushed = true;
   }
 
-  return <p>Tree</p>;
+  // Get the current frame of the tree
+  const treeRoot = treeHis[id]?.[Math.min(frame, treeHis[id].length - 1)] ?? null;
+
+  return <>Tree</>;
 };

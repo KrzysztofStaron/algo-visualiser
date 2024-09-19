@@ -1,28 +1,22 @@
 "use client";
 
 import { FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import {
-  arrayHistory,
-  arrayReset,
-  indexHistory,
-  groupHistory,
-  createArrayHandler,
-  syncArray,
-} from "./visualizers/array/ArrayComponent";
-import { createLabelHandler, labelHistory, syncLabel, resetLabel } from "./visualizers/label/LabelComponent";
+
+import { arrayHistory, indexHistory, groupHistory, createArrayHandler } from "./visualizers/array/ArrayComponent";
+import { createLabelHandler, labelHistory } from "./visualizers/label/LabelComponent";
+import { createStackHandler, stackHistory } from "./visualizers/stack/StackComponent";
+import { createTreeHandler, TreeNodeHandler } from "./visualizers/tree/TreeComponent";
 import {
   createMatrixHandler,
   matrixColorHistory,
   matrixGroupHistory,
   matrixHistory,
-  matrixSync,
   resetMatrix,
 } from "./visualizers/matrix/MatrixComponent";
+
 const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
 import SpeedModulator from "./SpeedModulator";
 import dynamic from "next/dynamic";
-import { createStackHandler, resetStack, stackHistory, syncStack } from "./visualizers/stack/StackComponent";
-import { createTreeHandler, resetTree, syncTree } from "./visualizers/tree/TreeComponent";
 
 type ComponentData = { type: ComponentType; id: number; metadata: any; reactComponent: FunctionComponent<any> };
 
@@ -31,13 +25,7 @@ export let syncFunctions: CallableFunction[] = [];
 
 export var ids: ComponentData[] = [];
 
-export const destructValue = (lambda: any) => {
-  if (typeof lambda === "function") {
-    return lambda();
-  }
-
-  return lambda;
-};
+class TreeNode extends TreeNodeHandler {}
 
 export enum ComponentType {
   BASE = "Base",
@@ -47,6 +35,26 @@ export enum ComponentType {
   STACK = "Stack",
   TREE = "Tree",
 }
+
+const reset = () => {
+  ids = [];
+
+  // for some reason it must be reseted manually
+  resetMatrix();
+
+  resetFunctions.forEach(lambda => {
+    lambda();
+  });
+};
+
+export const sync = () => {
+  const maxLen = calcLen();
+  console.log(`sync(), maxLen: ${maxLen}`);
+
+  syncFunctions.forEach(lambda => {
+    lambda(maxLen);
+  });
+};
 
 const calcLen = () => {
   let max = 0;
@@ -75,24 +83,33 @@ const calcLen = () => {
   return max;
 };
 
-const reset = () => {
-  ids = [];
+export const destructValue = (lambda: any) => {
+  if (typeof lambda === "function") {
+    return lambda();
+  }
 
-  // for some reason it must be reseted manually
-  resetMatrix();
-
-  resetFunctions.forEach(lambda => {
-    lambda();
-  });
+  return lambda;
 };
 
-export const sync = () => {
-  const maxLen = calcLen();
-  console.log(`sync(), maxLen: ${maxLen}`);
+// Quality of life, so user don't have to provide root as an argument
+const createArray = (metadata?: any) => {
+  return createArrayHandler(register, metadata ?? "");
+};
 
-  syncFunctions.forEach(lambda => {
-    lambda(maxLen);
-  });
+const createLabel = (metadata: any) => {
+  return createLabelHandler(register, metadata ?? "");
+};
+
+const createMatrix = (metadata: any) => {
+  return createMatrixHandler(register, metadata ?? "");
+};
+
+const createStack = (metadata: any) => {
+  return createStackHandler(register, metadata ?? "");
+};
+
+const createTree = (metadata: any) => {
+  return createTreeHandler(register, metadata ?? "");
 };
 
 const register = (component: ComponentType, reactComponent: FunctionComponent<any>, metadata?: any) => {
@@ -104,10 +121,14 @@ const register = (component: ComponentType, reactComponent: FunctionComponent<an
 };
 
 export default function VisualizerApp() {
-  const [code, setCode] = useState(`const matrix = createMatrix()
+  const [code, setCode] = useState(`const tree = createTree()
 
-matrix.colors({ 0: "bg-red-400", 1: "green", 2: "#ff00ff" })
-matrix.content([[0, 1, 2]])
+const t = new TreeNode("root");
+t.add(new TreeNode(1))
+t.add(new TreeNode(2))
+
+tree.content(t)
+
 `);
 
   const [speed, setSpeed] = useState(150);
@@ -121,27 +142,6 @@ matrix.content([[0, 1, 2]])
 
   const interval = useRef<NodeJS.Timeout>();
   const maxLen = useRef(0);
-
-  // Quality of life, so user don't have to provide root as an argument
-  const createArray = (metadata?: any) => {
-    return createArrayHandler(register, metadata ?? "");
-  };
-
-  const createLabel = (metadata: any) => {
-    return createLabelHandler(register, metadata ?? "");
-  };
-
-  const createMatrix = (metadata: any) => {
-    return createMatrixHandler(register, metadata ?? "");
-  };
-
-  const createStack = (metadata: any) => {
-    return createStackHandler(register, metadata ?? "");
-  };
-
-  const createTree = (metadata: any) => {
-    return createTreeHandler(register, metadata ?? "");
-  };
 
   // function that runs every frame
   const executeFrame = () => {
