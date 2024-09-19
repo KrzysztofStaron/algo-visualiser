@@ -213,7 +213,7 @@ tree.content(t)
   // Automatically click the start button 1 second after component mounts
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (startButtonRef.current) {
+      if (startButtonRef.current && process.env.NODE_ENV !== "production") {
         startButtonRef.current.click();
       }
     }, 1000);
