@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ComponentType, ids, resetFunctions, syncFunctions } from "../../VisualizerApp";
 
 export class TreeNodeHandler {
@@ -90,16 +90,54 @@ const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; met
   console.log("levels: ", levels);
   console.log("data:", data);
 
+  useEffect(() => {
+    const handleResize = () => {
+      // Calculate the maximum width for nodes at this level
+      const elements = document.querySelectorAll(`.node`);
+      const maxWidth = Array.from(elements).reduce((max, el) => Math.max(max, el.clientWidth), 0);
+
+      // Set all nodes at this level to the maximum width
+      elements.forEach(el => el.setAttribute("style", `width: ${maxWidth}px;`));
+    };
+
+    // Call handleResize initially and also on window resize
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return <TreeRow node={data} level={0} />;
 };
 
 // Recursive component to render tree structure
 const TreeRow = ({ node, level }: { node: any; level: number }) => {
+  useEffect(() => {
+    const handleResize = () => {
+      // Calculate the maximum width for nodes at this level
+      const elements = document.querySelectorAll(`.node-${level}`);
+      const maxWidth = Array.from(elements).reduce((max, el) => Math.max(max, el.clientWidth), 0);
+
+      // Set all nodes at this level to the maximum width
+      elements.forEach(el => el.setAttribute("style", `width: ${maxWidth}px;`));
+    };
+
+    // Call handleResize initially and also on window resize
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [level]);
+
   if (!node) return null;
 
   return (
     <div className={`flex flex-col items-center m-4 text-black node-${level}`}>
-      <div className="bg-gray-300 p-5 rounded-2xl text-center truncate">{node.label}</div>
+      <div className="bg-gray-300 p-5 rounded-full text-center truncate node">{node.label}</div>
       {node.children && (
         <div className="flex flex-row justify-center gap-5">
           {node.children.map((child: any, index: number) => (
