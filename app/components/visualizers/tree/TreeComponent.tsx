@@ -1,12 +1,12 @@
-import { ComponentType, ids, resetFunctions, syncFunctions } from "../../VisualizerApp";
 import React from "react";
+import { ComponentType, ids, resetFunctions, syncFunctions } from "../../VisualizerApp";
 
 export class TreeNodeHandler {
-  data: string;
+  label: string;
   children: TreeNodeHandler[];
 
   constructor(data: any) {
-    this.data = data;
+    this.label = data;
     this.children = [];
   }
 
@@ -15,7 +15,7 @@ export class TreeNodeHandler {
   }
 
   remove(data: any) {
-    this.children = this.children.filter(node => node.data !== data);
+    this.children = this.children.filter(node => node.label !== data);
   }
 
   traverse(callback: (node: TreeNodeHandler) => void) {
@@ -59,8 +59,80 @@ const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; met
     pushed = true;
   }
 
-  // Get the current frame of the tree
-  const treeRoot = treeHis[id]?.[Math.min(frame, treeHis[id].length - 1)] ?? null;
+  const data = {
+    label: "root",
+    children: [
+      {
+        label: "adam",
+        children: [
+          {
+            label: "adam-child",
+            children: [
+              {
+                label: "adam-child-child",
+              },
+            ],
+          },
+          {
+            label: "adam-child-2",
+          },
+        ],
+      },
+      {
+        label: "eva",
+      },
+    ],
+  };
 
-  return <>Tree</>;
+  const levels = getLevels(data);
+  const maxWidthByLevel = getMaxWidthByLevel(levels);
+  console.log("maxW: ", maxWidthByLevel);
+  console.log("levels: ", levels);
+  console.log("data:", data);
+
+  return <TreeRow node={data} level={0} />;
+};
+
+// Recursive component to render tree structure
+const TreeRow = ({ node, level }: { node: any; level: number }) => {
+  if (!node) return null;
+
+  return (
+    <div className={`flex flex-col items-center m-4 text-black node-${level}`}>
+      <div className="bg-gray-300 p-5 rounded-2xl text-center truncate">{node.label}</div>
+      {node.children && (
+        <div className="flex flex-row justify-center gap-5">
+          {node.children.map((child: any, index: number) => (
+            <TreeRow key={index} node={child} level={level + 1} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Function to traverse the tree and determine levels
+const getLevels = (node: any, level = 0, levels: Record<number, any[]> = {}): Record<number, any[]> => {
+  if (!levels[level]) levels[level] = [];
+  levels[level].push({ ...node, level });
+
+  if (node.children) {
+    node.children.forEach((child: any) => getLevels(child, level + 1, levels));
+  }
+
+  return levels;
+};
+
+// Function to calculate the maximum width for each level
+const getMaxWidthByLevel = (levels: Record<number, any[]>): Record<number, number> => {
+  const maxWidthByLevel: Record<number, number> = {};
+
+  Object.keys(levels).forEach((level: any) => {
+    const width = Math.max(
+      ...levels[level].map((node: any) => node.label.length * 10) // Approximation for width
+    );
+    maxWidthByLevel[level] = width + 20; // Add padding for aesthetics
+  });
+
+  return maxWidthByLevel;
 };
