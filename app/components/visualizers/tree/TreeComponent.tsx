@@ -6,8 +6,13 @@ import { ComponentType, ids, resetFunctions, syncFunctions } from "../../Visuali
 export class TreeNodeHandler {
   label: string;
   children: TreeNodeHandler[];
+  active: boolean;
+  showPathFromParent: boolean;
 
   constructor(data: any) {
+    this.active = false;
+    this.showPathFromParent = false;
+
     if (Array.isArray(data)) {
       this.label = data[0];
       this.children = data[1].map((e: any) => new TreeNodeHandler(e));
@@ -15,6 +20,11 @@ export class TreeNodeHandler {
       this.label = data;
       this.children = [];
     }
+  }
+
+  setHighlighting(val: boolean, showPathFromParent?: boolean) {
+    this.active = val;
+    this.showPathFromParent = showPathFromParent == undefined ? val : showPathFromParent;
   }
 
   add(data: any) {
@@ -136,7 +146,7 @@ const TreeComponent = ({ id, frame, metadata }: { id: number; frame: number; met
 };
 
 // Recursive component to render tree structure
-const TreeRow = ({ node, level }: { node: any; level: number }) => {
+const TreeRow = ({ node, level }: { node: TreeNodeHandler; level: number }) => {
   useEffect(() => {
     const handleResize = () => {
       // Calculate the maximum width for nodes at this level
@@ -160,13 +170,41 @@ const TreeRow = ({ node, level }: { node: any; level: number }) => {
 
   return (
     <div className={`flex flex-col items-center text-white node-${level} gap-2`}>
-      <p className="bg-stone-900 p-3 px-5 rounded-full text-center truncate max-w-48 text-lg font-semibold border-black border-4">
+      <p
+        className={`${
+          node.active ? "bg-sky-600" : "bg-stone-900"
+        } p-3 px-5 rounded-full text-center truncate max-w-48 text-lg font-semibold border-black border-4`}
+        style={{ minWidth: "60px", minHeight: "60px" }}
+      >
         {node.label}
       </p>
+      {node.children.length > 0 && (
+        <p
+          className={`flex justify-center relative bottom-3 font-extrabold ${
+            node.children.some(child => child.showPathFromParent) ? "text-sky-600" : "text-black"
+          }`}
+        >
+          |
+        </p>
+      )}
       {node.children && (
-        <div className="flex flex-row border-t-2 pt-2 gap-4 border-stone-950">
-          {node.children.map((child: any, index: number) => (
-            <TreeRow key={index} node={child} level={level + 1} />
+        <div
+          className={`flex flex-row gap-4 ${
+            node.children.some(child => child.showPathFromParent) ? "border-sky-600" : "border-black"
+          } relative bottom-6 z-0`}
+          style={{ borderTopWidth: "3px" }}
+        >
+          {node.children.map((child: TreeNodeHandler, index: number) => (
+            <div className="relative bottom-2">
+              <p
+                className={`flex justify-center ${
+                  child.showPathFromParent ? "text-sky-600" : "text-black"
+                } font-extrabold relative top-1`}
+              >
+                |
+              </p>
+              <TreeRow key={index} node={child} level={level + 1} />
+            </div>
           ))}
         </div>
       )}

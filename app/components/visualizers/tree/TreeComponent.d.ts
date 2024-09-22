@@ -10,6 +10,16 @@ declare class TreeNode {
   data: string;
 
   /**
+   * Is the node highligted
+   */
+  active: boolean;
+
+  /**
+   * Should make path from parent to node blue
+   */
+  showPathFromParent: boolean;
+
+  /**
    * The children of this node.
    */
   children: TreeNode[];
@@ -20,6 +30,13 @@ declare class TreeNode {
    * @param data The data to be added to the new child node.
    */
   add(data: TreeNode | NodeAsArray): void;
+
+  /**
+   * Sets highligting for a node
+   *
+   * @param val highlight or not to highlight it is a question
+   */
+  setHighlighting(val: boolean): void;
 
   /**
    * Removes a child node containing the specified data.
@@ -36,10 +53,10 @@ declare interface TreeObject {
   /**
    * Sets the content of the tree.
    *
-   * @param data A 2D array of strings representing the tree content.
+   * @param data The tree data
    * @param synchronize Optional flag to trigger synchronization after setting content.
    */
-  content(data: Tree, synchronize?: boolean): void;
+  content(data: TreeNode, synchronize?: boolean): void;
 }
 
 /**
