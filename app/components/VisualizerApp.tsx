@@ -249,7 +249,7 @@ tree.content(t);
       if (startButtonRef.current && process.env.NODE_ENV !== "production") {
         startButtonRef.current.click();
       }
-    }, 1000);
+    }, 900);
 
     // Cleanup the timer on unmount
     return () => clearTimeout(timer);
