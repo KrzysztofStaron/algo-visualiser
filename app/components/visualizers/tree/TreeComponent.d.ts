@@ -35,21 +35,22 @@ declare class TreeNode {
    * Sets highligting for a node
    *
    * @param val highlight or not to highlight it is a question
+   * @param showPathFromParent if not specyfied it takes the value of **val**
    */
-  setHighlighting(val: boolean): void;
+  setHighlighting(val: boolean, showPathFromParent?: boolean): void;
 
   /**
-   * Resulsivly sets **showPathFromParent** to false for all children
+   * Reculsivly sets **showPathFromParent** to false for all children
    */
   resetPaths();
 
   /**
-   * Resulsivly sets **active** to false for all children
+   * Reculsivly sets **active** to false for all children
    */
   resetHighlights();
 
   /**
-   * Resulsivly calc **setHighlighting(false)** for all children
+   * Reculsivly calc **setHighlighting(false)** for all children
    */
   resetAll();
 

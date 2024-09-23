@@ -122,7 +122,6 @@ export const createTreeHandler = (register: CallableFunction, metadata: any) => 
 
   return {
     content: (data: TreeNodeHandler) => {
-      // Create a deep clone of the TreeNodeHandler instance
       const deepClone = structuredClone(data);
       treeHis[id].push(deepClone);
     },
@@ -236,7 +235,7 @@ const TreeRow = ({ node, level }: { node: TreeNodeHandler; level: number }) => {
           style={{ borderTopWidth: "3px" }}
         >
           {node.children.map((child: TreeNodeHandler, index: number) => (
-            <div className="relative bottom-2">
+            <div key={index} className="relative bottom-2">
               <p
                 className={`flex justify-center ${
                   child.showPathFromParent ? "text-sky-600" : "text-black"

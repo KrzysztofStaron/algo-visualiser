@@ -15,6 +15,9 @@ import {
   resetMatrix,
 } from "./visualizers/matrix/MatrixComponent";
 
+import Head from "next/head";
+import Script from "next/script";
+
 const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
 
 type ComponentData = {
@@ -203,8 +206,13 @@ tree.content(t);
 
     try {
       console.log("< timeline eval >");
+
       if (typeof window !== "undefined") {
-        eval(code);
+        const transpiledCode = (window as any).ts.transpileModule(code, {
+          compilerOptions: { module: (window as any).ts.ModuleKind.CommonJS },
+        }).outputText;
+
+        eval(transpiledCode);
       }
     } catch (err: any) {
       console.error(err);
@@ -248,60 +256,66 @@ tree.content(t);
   }, []);
 
   return (
-    <div className="h-screen flex w-screen">
-      <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-min">
-        <MonacoEditor code={code} setCode={setCode} />
-        <button
-          ref={startButtonRef}
-          className="btn btn-success"
-          onClick={() => {
-            if (running.current) {
-              running.current = false;
-              setButtonMsg("Start");
-            } else {
-              run();
-              setButtonMsg("Stop");
-            }
-          }}
-        >
-          {buttonMsg}
-        </button>
-      </div>
+    <>
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/typescript/4.9.4/typescript.min.js"
+        strategy="beforeInteractive"
+      />
+      <div className="h-screen flex w-screen">
+        <div className="flex flex-col mb-2 border-l-2 border-gray-600 w-min">
+          <MonacoEditor code={code} setCode={setCode} />
+          <button
+            ref={startButtonRef}
+            className="btn btn-success"
+            onClick={() => {
+              if (running.current) {
+                running.current = false;
+                setButtonMsg("Start");
+              } else {
+                run();
+                setButtonMsg("Stop");
+              }
+            }}
+          >
+            {buttonMsg}
+          </button>
+        </div>
 
-      <div className="flex flex-col w-full h-screen">
-        <div className="flex items-center justify-center h-screen grow flex-col overflow-hidden">
-          <div className="flex gap-10">
-            <div className="flex">
-              {ids.map((e, key) => {
-                if (ids[key].metadata.orientation !== "v") {
-                  return null;
-                }
+        <div className="flex flex-col w-full h-screen">
+          <div className="flex items-center justify-center h-screen grow flex-col overflow-hidden">
+            <div className="flex gap-10">
+              <div className="flex">
+                {ids.map((e, key) => {
+                  if (ids[key].metadata.orientation !== "v") {
+                    return null;
+                  }
 
-                return <e.reactComponent key={key} id={ids[key].id} frame={frame} metadata={ids[key].metadata} />;
-              })}
-            </div>
-            <div className="flex flex-col items-center justify-center gap-10">
-              {ids.map((e, key) => {
-                if (ids[key].metadata.orientation === "v") {
-                  return null;
-                }
-                // Render the component as JSX with props
-                return <e.reactComponent key={key} id={ids[key].id} frame={frame} metadata={ids[key].metadata} />;
-              })}
+                  return <e.reactComponent key={key} id={ids[key].id} frame={frame} metadata={ids[key].metadata} />;
+                })}
+              </div>
+              <div className="flex flex-col items-center justify-center gap-10">
+                {ids.map((e, key) => {
+                  if (ids[key].metadata.orientation === "v") {
+                    return null;
+                  }
+                  // Render the component as JSX with props
+                  return <e.reactComponent key={key} id={ids[key].id} frame={frame} metadata={ids[key].metadata} />;
+                })}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="w-full flex justify-between">
-          <div className="grow flex justify-center">
-            <SpeedModulator speed={speed} setSpeed={setSpeed} />
+          <div className="w-full flex justify-between">
+            <div className="grow flex justify-center">
+              <SpeedModulator speed={speed} setSpeed={setSpeed} />
+            </div>
+            <progress
+              className="progress progress-accent w-40 h-4 m-2 self-end"
+              value={buttonMsg === "Stop" ? frame : 0}
+              max={maxLen.current}
+            ></progress>
           </div>
-          <progress
-            className="progress progress-accent w-40 h-4 m-2 self-end"
-            value={buttonMsg === "Stop" ? frame : 0}
-            max={maxLen.current}
-          ></progress>
         </div>
       </div>
-    </div>
+    </>
   );
 }
