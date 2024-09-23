@@ -7,7 +7,7 @@ declare class TreeNode {
   /**
    * The data contained in the node.
    */
-  data: string;
+  label: string;
 
   /**
    * Is the node highligted
@@ -37,6 +37,21 @@ declare class TreeNode {
    * @param val highlight or not to highlight it is a question
    */
   setHighlighting(val: boolean): void;
+
+  /**
+   * Resulsivly sets **showPathFromParent** to false for all children
+   */
+  resetPaths();
+
+  /**
+   * Resulsivly sets **active** to false for all children
+   */
+  resetHighlights();
+
+  /**
+   * Resulsivly calc **setHighlighting(false)** for all children
+   */
+  resetAll();
 
   /**
    * Removes a child node containing the specified data.

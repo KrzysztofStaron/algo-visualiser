@@ -8,10 +8,12 @@ export class TreeNodeHandler {
   children: TreeNodeHandler[];
   active: boolean;
   showPathFromParent: boolean;
+  parent: TreeNodeHandler | undefined;
 
-  constructor(data: any) {
+  constructor(data: any, parent?: TreeNodeHandler) {
     this.active = false;
     this.showPathFromParent = false;
+    this.parent = parent;
 
     if (Array.isArray(data)) {
       this.label = data[0];
@@ -27,11 +29,55 @@ export class TreeNodeHandler {
     this.showPathFromParent = showPathFromParent == undefined ? val : showPathFromParent;
   }
 
+  drawPathFromRoot() {
+    if (this.parent == undefined) {
+      return;
+    }
+
+    this.showPathFromParent = true;
+
+    this.parent.drawPathFromRoot();
+  }
+
+  resetPaths() {
+    const dfs = (node: TreeNodeHandler) => {
+      node.showPathFromParent = false;
+      node.children.forEach(child => {
+        dfs(child);
+      });
+    };
+
+    dfs(this);
+  }
+
+  resetHighlights() {
+    const dfs = (node: TreeNodeHandler) => {
+      node.active = false;
+      node.children.forEach(child => {
+        dfs(child);
+      });
+    };
+
+    dfs(this);
+  }
+
+  resetAll() {
+    const dfs = (node: TreeNodeHandler) => {
+      node.setHighlighting(false);
+      node.children.forEach(child => {
+        dfs(child);
+      });
+    };
+
+    dfs(this);
+  }
+
   add(data: any) {
     if (data instanceof TreeNodeHandler) {
+      data.parent = this;
       this.children.push(data);
     } else if (typeof data === "number" || typeof data === "string") {
-      this.children.push(new TreeNodeHandler(data));
+      this.children.push(new TreeNodeHandler(data, this));
     } else if (Array.isArray(data)) {
       this.addArray(data);
       // Add all elements of the array as children
@@ -45,7 +91,7 @@ export class TreeNodeHandler {
     if (array.length === 0) return;
 
     // The first element of the array is the label for this node
-    const node = new TreeNodeHandler(array[0]);
+    const node = new TreeNodeHandler(array[0], this);
 
     // Add each item in the array
     array[1].forEach((item: string | string[]) => {
@@ -62,13 +108,8 @@ export class TreeNodeHandler {
     this.children.push(node);
   }
 
-  remove(data: any) {
+  remove(data: string) {
     this.children = this.children.filter(node => node.label !== data);
-  }
-
-  traverse(callback: (node: TreeNodeHandler) => void) {
-    callback(this);
-    this.children.forEach(child => child.traverse(callback));
   }
 }
 
