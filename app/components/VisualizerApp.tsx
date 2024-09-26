@@ -15,8 +15,8 @@ import {
   resetMatrix,
 } from "./visualizers/matrix/MatrixComponent";
 
-import Head from "next/head";
 import Script from "next/script";
+import { leetcode } from "../interfaces/leetcode";
 
 const MonacoEditor = dynamic(() => import("./MonacoEditor"), { ssr: false });
 
